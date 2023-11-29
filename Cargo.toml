@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+members = [
+  "example",
+  "hmr-macro",
+  "hmr-server",
+  "wasm-project",
+]
+exclude = [
+#  "wasm-project",
+]
+
