@@ -1,6 +1,6 @@
 # rust-hmr-experiment
 
-Experimenting the compilation of a single `.rs` file -> `.wasm` module
+Experimenting the compilation of a single `.rs` file into `.wasm` module
 
 
 Ultimately try to make Proof of Concept for HMR on rust web frontend framework (Leptos)
