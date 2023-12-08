@@ -22,15 +22,6 @@ fn run() {
     spawn_local(async {
         main()
             .await
-            .map_err(|e| {
-                Reflect::set(
-                    &web_sys::window().unwrap(),
-                    &"err".into(),
-                    &e.clone().into(),
-                )
-                .unwrap_throw();
-                format!("convert obj err: {:?}", e)
-            })
             .unwrap_throw();
     });
 }

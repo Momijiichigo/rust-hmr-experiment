@@ -41,6 +41,7 @@ pub async fn setup(config: &mut Config) -> Result<(), Box<dyn std::error::Error>
     Command::new("wasm-pack")
         .args([
             "build",
+            "--dev",
             config.project_dir.to_str().ok_or(ERR_MSG_PATH_TO_STR)?,
             "--target",
             "web",
