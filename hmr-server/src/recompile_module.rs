@@ -9,6 +9,11 @@ use tower_http::services::ServeDir;
 
 use crate::*;
 
+#[cfg(not(feature = "debug-compilation-wasm-pack"))]
+static WASM_PACK_COMPILATION_MODE: &str = "release";
+#[cfg(feature = "debug-compilation-wasm-pack")]
+static WASM_PACK_COMPILATION_MODE: &str = "debug";
+
 pub async fn recompile_module(
     config: &Config,
     mod_path: &Path,
@@ -16,9 +21,12 @@ pub async fn recompile_module(
     let mut library_paths = HashSet::<String>::new();
     let mut library_names = HashSet::<String>::new();
     let target_dir = &config.target_dir.to_owned().ok_or("Target dir not set")?;
-    if let Ok(entries) =
-        fs::read_dir(target_dir.join("wasm32-unknown-unknown/release/deps"))
-    {
+    if let Ok(entries) = fs::read_dir(
+        target_dir
+            .join("wasm32-unknown-unknown")
+            .join(WASM_PACK_COMPILATION_MODE)
+            .join("deps"),
+    ) {
         for entry in entries {
             let entry = entry?.path();
             if entry.extension().unwrap() == "d" {
@@ -48,8 +56,7 @@ pub async fn recompile_module(
                             .collect::<Vec<&str>>()
                             .join("_");
                         library_names.insert(crate_name.clone());
-                        library_paths
-                            .insert(format!("{}/src", crate_path.to_str().unwrap()));
+                        library_paths.insert(format!("{}/src", crate_path.to_str().unwrap()));
                         // library_paths.insert(format!(
                         //     "{}={}",
                         //     crate_name,
@@ -67,11 +74,9 @@ pub async fn recompile_module(
         .with_extension("wasm");
     let dep_wasm_path = target_dir
         .join("wasm32-unknown-unknown")
-        .join("release")
+        .join(WASM_PACK_COMPILATION_MODE)
         .join("deps");
-    let dep_release_path = target_dir
-        .join("release")
-        .join("deps");
+    let dep_release_path = target_dir.join(WASM_PACK_COMPILATION_MODE).join("deps");
     let input_name = config.project_dir.join("src").join(mod_path);
     let mut args = vec![
         "--edition",
