@@ -31,6 +31,8 @@ async fn main() -> Result<(), JsValue> {
 
     log!("import object: {:?}", __wbg_get_imports());
 
+    mod1::component_a();
+
     let instance = get_wasm("wasm/mod1.wasm").await?;
     log!("Got wasm instance");
     let exports = instance.exports();

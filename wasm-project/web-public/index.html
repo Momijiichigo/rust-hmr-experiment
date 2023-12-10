@@ -3,18 +3,6 @@
     <title>Home</title>
   </head>
   <body>
-    <script type="module">
-      import init, { add, get_wasm_table, get_wasm_memory, get_imports } from './pkg/wasm_project.js';
-
-      async function run() {
-        await init();
-	window.wasmTable = get_wasm_table();
-	window.wasmMemory = get_wasm_memory();
-	window.imports = get_imports();
-	console.log(add(1, 2));
-      }
-
-      run();
-    </script>
+    <script type="module" src="./index.js"></script>
   </body>
 </html>
