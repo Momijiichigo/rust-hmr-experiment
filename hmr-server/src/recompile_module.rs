@@ -87,6 +87,10 @@ pub async fn recompile_module(
         "opt-level=1",
         "--crate-type",
         "cdylib",
+
+        // "--emit",
+        // "obj",
+
         "-L",
         dep_wasm_path.to_str().ok_or(ERR_MSG_PATH_TO_STR)?,
         "-L",

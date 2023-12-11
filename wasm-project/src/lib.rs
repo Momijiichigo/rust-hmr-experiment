@@ -10,8 +10,10 @@ use utils::get_wasm;
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(a: &str);
+    // #[wasm_bindgen(js_namespace = window)]
+    // fn __wbg_get_imports() -> JsValue;
     #[wasm_bindgen(js_namespace = window)]
-    fn __wbg_get_imports() -> JsValue;
+    fn __get_hmr_import_obj() -> Object;
 }
 
 macro_rules! log {
@@ -29,7 +31,6 @@ fn run() {
 async fn main() -> Result<(), JsValue> {
     log!("Hello, world!");
 
-    log!("import object: {:?}", __wbg_get_imports());
 
     mod1::component_a();
 
@@ -47,10 +48,10 @@ pub fn add(a: i32, b: i32) -> i32 {
     a + b
 }
 
-#[wasm_bindgen]
-pub fn get_imports() -> Object {
-    __wbg_get_imports().into()
-}
+// #[wasm_bindgen]
+// pub fn get_imports() -> Object {
+//     __wbg_get_imports().into()
+// }
 
 #[wasm_bindgen]
 pub fn get_wasm_table() -> Object {
