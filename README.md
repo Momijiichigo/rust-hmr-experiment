@@ -1,9 +1,9 @@
 # rust-hmr-experiment
 
-Experimenting the compilation of a single `.rs` file into `.wasm` module
+Rust Web Dev;
+Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
 
-
-Ultimately try to make Proof of Concept for HMR on rust web frontend framework (Leptos)
+![overview](./README_MEDIA/brief_overview.png)
 
 ## Brief Roadmap
 
@@ -13,6 +13,9 @@ Ultimately try to make Proof of Concept for HMR on rust web frontend framework (
   - [x] Import object: `__wbindgen_placeholder__`, `__wbindgen_externref_xform__` fields
   - [ ] `getStringFromWasm0` refers the address of wrong wasm memory (the host wasm memory)
     - Instantiate the component module using the same & shared memory?
+- Workarounds
+  - Plan A
+    - Compile 
 - [ ] HMR (without Leptos)
 - [ ] HMR (with Leptos)
 - [ ] rust source modifier plugin (for activating HMR thru plugin interface)

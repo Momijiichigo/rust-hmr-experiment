@@ -11,6 +11,8 @@ extern "C" {
 macro_rules! log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
+
+#[no_mangle]
 #[wasm_bindgen]
 pub fn component_a() {
     log!("Hello mod1");

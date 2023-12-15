@@ -1,3 +1,4 @@
+use anyhow::{Context, Error};
 use axum::{
     routing::{get, get_service},
     Router, Server,
@@ -6,6 +7,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::{collections::HashSet, fs};
 use tower_http::services::ServeDir;
+use walrus::Module;
 
 use crate::*;
 
@@ -87,10 +89,8 @@ pub async fn recompile_module(
         "opt-level=1",
         "--crate-type",
         "cdylib",
-
-        // "--emit",
-        // "obj",
-
+        "--emit",
+        "obj",
         "-L",
         dep_wasm_path.to_str().ok_or(ERR_MSG_PATH_TO_STR)?,
         "-L",
@@ -113,5 +113,45 @@ pub async fn recompile_module(
     // compile one module into wasm module using rustc
     Command::new("rustc").args(args).status()?;
 
+    let mut module =
+        module_from_bytes(&fs::read(output_name)?).context("failed to parse bytes as wasm")?;
+
+    demangle(&mut module);
+
     Ok(())
+}
+
+fn module_from_bytes(bytes: &[u8]) -> Result<Module, Error> {
+    walrus::ModuleConfig::new()
+        .parse(bytes)
+        .context("failed to parse bytes as wasm")
+}
+
+fn demangle(module: &mut Module) {
+    // module.imports.iter_mut().for_each(|name| {
+    //     println!("import: {:?}", name);
+    // });
+
+    module.funcs.iter_local().for_each(|(id, func)| {
+        println!("func: {:?}", func);
+        // println!("func index {:?}", walrus::IdsToIndices::default().get_func_index(id));
+    });
+
+    // module.exports.iter_mut().for_each(|export| {
+    //     println!("export: {:?}", export);
+    // });
+
+    // module.globals.iter().for_each(|global| {
+    //     println!("global: {:?}", global);
+    // });
+
+    module.customs.iter().for_each(|custom| {
+        println!("custom: {:?}", custom);
+        let data: String =
+            String::from_utf8(custom.1.data(&walrus::IdsToIndices::default()).into_owned())
+                .unwrap();
+        println!("custom: {:?}", data);
+
+        // println!("{:?}", walrus::IdsToIndices::default().get_func_index(module.funcs.by_name("func9").unwrap()));
+    });
 }
