@@ -17,7 +17,7 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
   - Plan A
     - [x] Compile `mod1.rs` into object file with `--emit obj` flag in `rustc`
     - [ ] Modify the wasm binary with [Walrus](https://github.com/rustwasm/walrus)
-    - [ ] pass in memories and imports to instanciate `mod1.wasm`
+    - [ ] pass in the original host's memories and imports to instanciate `mod1.wasm`
       - so it can use the shared js glue codes
   - Plan B
     - generate separate js glue code using [wasm-bindgen-cli-support](https://docs.rs/wasm-bindgen-cli-support/latest/wasm_bindgen_cli_support/index.html)
