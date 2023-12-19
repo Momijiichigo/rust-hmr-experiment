@@ -22,4 +22,6 @@ tokio = { version = "1.33.0", features = ["full"] }
 tower = "0.4.13"
 tower-http = { version = "0.4.4", features = ["fs"] }
 walrus = { version = "0.20.3", features = ["parallel"] }
+id-arena = "2.2.1"
 rustc-demangle = "0.1.23"
+nom = "7.1"
