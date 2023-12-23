@@ -22,15 +22,12 @@ macro_rules! log {
 #[wasm_bindgen(start)]
 fn run() {
     spawn_local(async {
-        main()
-            .await
-            .unwrap_throw();
+        main().await.unwrap_throw();
     });
 }
 
 async fn main() -> Result<(), JsValue> {
     log!("Hello, world!");
-
 
     mod1::component_a();
 
@@ -60,5 +57,24 @@ pub fn get_wasm_table() -> Object {
 
 #[wasm_bindgen]
 pub fn get_wasm_memory() -> Object {
+    let a = wasm_bindgen::__rt::link_mem_intrinsics;
     wasm_bindgen::memory().into()
+}
+
+#[wasm_bindgen]
+pub unsafe fn rust_alloc(size: usize, align: usize) -> *mut u8 {
+    std::alloc::alloc(std::alloc::Layout::from_size_align(size, align).unwrap())
+}
+
+#[wasm_bindgen]
+pub unsafe fn rust_dealloc(ptr: *mut u8, size: usize, align: usize) {
+    std::alloc::dealloc(
+        ptr,
+        std::alloc::Layout::from_size_align(size, align).unwrap(),
+    )
+}
+
+#[wasm_bindgen]
+pub unsafe fn handle_alloc_error(size: usize, align: usize) {
+    std::alloc::handle_alloc_error(std::alloc::Layout::from_size_align(size, align).unwrap());
 }

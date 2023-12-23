@@ -8,14 +8,11 @@ use nom::{
     Err, IResult,
 };
 
-fn error_with_context<I: Copy,O>(input: I, msg: &'static str) -> IResult<I,O,Error<I>> {
-    Err(Err::Error(ContextError::add_context(input, msg, Error::new(input, ErrorKind::Fail))))
-}
 pub fn take_linking_section(input: &[u8]) -> IResult<&[u8], Vec<SymbolInfo>> {
     // # version
     let (input, version) = take(1usize)(input)?;
 
-    if version != &[2] {
+    if version != [2] {
         return error_with_context(input, "version is not 2");
     }
 
@@ -23,12 +20,12 @@ pub fn take_linking_section(input: &[u8]) -> IResult<&[u8], Vec<SymbolInfo>> {
     // ## type
     let (input, subsection_type) = take(1usize)(input)?;
 
-    if subsection_type != &[8] {
+    if subsection_type != [8] {
         return error_with_context(input, "subsection type is not 8");
     }
 
     // ## payload length
-    let (input, payload_length) = take_var_uint_32(input)?;
+    let (input, _payload_length) = take_var_uint_32(input)?;
 
     // # WASM_SYMBOL_TABLE
     // ## count of syminfo
@@ -159,11 +156,14 @@ fn take_data_symbol(input: &[u8], flags: u32) -> IResult<&[u8], (Option<u32>, St
     if (flags & 0x10) == 0 {
         let (input, idx_) = take_var_uint_32(input)?;
         idx = Some(idx_);
-        let (input, offset) = take_var_uint_32(input)?;
-        let (input, size) = take_var_uint_32(input)?;
+        let (input, _offset) = take_var_uint_32(input)?;
+        let (input, _size) = take_var_uint_32(input)?;
         remaining = input;
     }
 
 
     Ok((remaining, (idx, name)))
+}
+fn error_with_context<I: Copy,O>(input: I, msg: &'static str) -> IResult<I,O,Error<I>> {
+    Err(Err::Error(ContextError::add_context(input, msg, Error::new(input, ErrorKind::Fail))))
 }

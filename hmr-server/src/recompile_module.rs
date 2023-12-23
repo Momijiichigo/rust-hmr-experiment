@@ -5,26 +5,26 @@ use axum::{
     Router, Server,
 };
 use nom::AsBytes;
-use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::{
+    borrow::Cow,
+    path::{Path, PathBuf},
+};
 use std::{collections::HashSet, fs};
 use tower_http::services::ServeDir;
-use walrus::{Module, IdsToIndices};
+use walrus::{IdsToIndices, Module};
 
-use crate::{*, parser_linking_section::take_linking_section};
+use crate::{parser_linking_section::take_linking_section, *};
 
 #[cfg(not(feature = "debug-compilation-wasm-pack"))]
 static WASM_PACK_COMPILATION_MODE: &str = "release";
 #[cfg(feature = "debug-compilation-wasm-pack")]
 static WASM_PACK_COMPILATION_MODE: &str = "debug";
 
-pub async fn recompile_module(
-    config: &Config,
-    mod_path: &Path,
-) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Result<()> {
     let mut library_paths = HashSet::<String>::new();
     let mut library_names = HashSet::<String>::new();
-    let target_dir = &config.target_dir.to_owned().ok_or("Target dir not set")?;
+    let target_dir = &config.target_dir.to_owned().context("Target dir not set")?;
     if let Ok(entries) = fs::read_dir(
         target_dir
             .join("wasm32-unknown-unknown")
@@ -33,7 +33,7 @@ pub async fn recompile_module(
     ) {
         for entry in entries {
             let entry = entry?.path();
-            if entry.extension().unwrap() == "d" {
+            if entry.extension().context("no file extension found")? == "d" {
                 // read file
                 let file = fs::read_to_string(entry)?;
 
@@ -94,12 +94,12 @@ pub async fn recompile_module(
         "--emit",
         "obj",
         "-L",
-        dep_wasm_path.to_str().ok_or(ERR_MSG_PATH_TO_STR)?,
+        dep_wasm_path.to_str().context(ERR_MSG_PATH_TO_STR)?,
         "-L",
-        dep_release_path.to_str().ok_or(ERR_MSG_PATH_TO_STR)?,
+        dep_release_path.to_str().context(ERR_MSG_PATH_TO_STR)?,
         "-o",
-        output_name.to_str().ok_or(ERR_MSG_PATH_TO_STR)?,
-        input_name.to_str().ok_or(ERR_MSG_PATH_TO_STR)?,
+        output_name.to_str().context(ERR_MSG_PATH_TO_STR)?,
+        input_name.to_str().context(ERR_MSG_PATH_TO_STR)?,
     ];
     // library_paths.iter().for_each(|path| {
     //     args.push("-L");
@@ -123,14 +123,14 @@ pub async fn recompile_module(
         .join("wasm")
         .join(mod_path)
         .with_extension("wasm");
-    add_export(&mut module);
+    add_export(&mut module)?;
     demangle(&mut module);
     module.emit_wasm_file(output_name)?;
 
     Ok(())
 }
 
-fn module_from_bytes(bytes: &[u8]) -> Result<Module, Error> {
+fn module_from_bytes(bytes: &[u8]) -> anyhow::Result<Module> {
     walrus::ModuleConfig::new()
         .parse(bytes)
         .context("failed to parse bytes as wasm")
@@ -153,56 +153,39 @@ fn demangle(module: &mut Module) {
     }
 }
 
-fn add_export(module: &mut Module) {
-    // module.imports.iter_mut().for_each(|name| {
-    //     println!("import: {:?}", name);
-    // });
-
-    // module.exports.iter_mut().for_each(|export| {
-    //     println!("export: {:?}", export);
-    // });
-
-    // module.globals.iter().for_each(|global| {
-    //     println!("global: {:?}", global);
-    // });
-
-
-    let mut funcs: Vec<_> = vec![];
-    module
+fn add_export(module: &mut Module) -> anyhow::Result<()> {
+    let custom = module
         .customs
         .iter()
         .find(|(_, custom)| custom.name() == "linking")
-        .and_then(|(_, custom)| {
-            let data = custom.data(&walrus::IdsToIndices::default());
+        .context("no linking custom section found in wasm")?
+        .1;
+    let data = custom.data(&walrus::IdsToIndices::default());
 
-            let data: &[u8] = data.as_bytes();
+    let (remain_bytes, info_list) = take_linking_section(&data)
+        .map_err(|e| e.to_owned())
+        .context("parsing linking custom section failed")?;
+    println!("remain_bytes: {:?}", remain_bytes);
+    println!("info_list: {:?}", info_list);
 
-            let (remain_bytes, info_list) = take_linking_section(data).ok()?;
-            println!("remain_bytes: {:?}", remain_bytes);
-            println!("info_list: {:?}", info_list);
-
-            funcs = info_list.into_iter().filter(|syminfo| {
-                if let SymbolInfo::Function(_, Some(_), false) = syminfo {
-                    true
-                } else {
-                    false
-                }
-            }).collect();
-            Some(())
-        }).unwrap();
+    let funcs: Vec<_> = info_list
+        .into_iter()
+        .filter(|syminfo| matches!(syminfo, SymbolInfo::Function(_, Some(_), false)))
+        .collect();
 
     module.funcs.iter_mut().for_each(|func| {
         // println!("func: {:?}", func);
         // println!("func: {:?}", func.name);
-        funcs.iter().find(|syminfo| {
+        for syminfo in funcs.iter() {
             if let SymbolInfo::Function(idx, Some(name), false) = syminfo {
                 if *idx as usize == func.id().index() {
                     // func.name = Some(name.clone());
                     module.exports.add(&name, func.id());
-                    return true;
+                    break;
                 }
             }
-            false
-        });
+        }
     });
+
+    Ok(())
 }

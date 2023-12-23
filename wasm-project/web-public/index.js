@@ -1,10 +1,20 @@
 
-import init, { add, get_wasm_table, get_wasm_memory } from './pkg/wasm_project.js';
+import init, { add, get_wasm_table, get_wasm_memory, rust_alloc, rust_dealloc, handle_alloc_error } from './pkg/wasm_project.js';
 
 
 const hmr_import_obj = {}
 window.__get_hmr_import_obj = () => hmr_import_obj;
+/*
+  (import "env" "__linear_memory") 1)
+  (import "env" "__rust_alloc") (param i32 i32) (result i32))
+  (import "env" "__rust_dealloc") (param i32 i32 i32))
+  (import "env" "wasm_bindgen::__rt::link_mem_intrinsics::h61974b3836908c38"))
+  (import "env" "<str as wasm_bindgen::describe::WasmDescribe>::describe::h63f15c8cb56b70b3"))
+  (import "env" "<() as wasm_bindgen::describe::WasmDescribe>::describe::h926585b83620374c"))
+  (import "env" "alloc::alloc::handle_alloc_error::h2edda2bcb5c36866") (param i32 i32))
 
+
+*/
 
 async function run() {
   await init();
@@ -16,6 +26,23 @@ async function run() {
     __wbindgen_externref_table_grow: (delta) => wasmTable.grow(delta),
     __wbindgen_externref_table_set_null: (idx) => wasmTable.set(idx),
   }
+
+  hmr_import_obj.env = new Proxy(
+    {
+      __linear_memory: wasmMemory,
+      __rust_alloc: rust_alloc,
+      __rust_dealloc: rust_dealloc,
+    }, {
+      get(target, prop, receiver) {
+	if (prop in target) {
+      	  return Reflect.get(...arguments);
+      	}
+	if (prop.includes("::describe::")) {
+	  return () => {};
+	}
+      }
+    }
+  )
 
   hmr_import_obj.__wbindgen_placeholder__ = new Proxy(imports.wbg, {
     get(target, prop, receiver) {
