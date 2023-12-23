@@ -33,7 +33,7 @@ async function run() {
       __rust_alloc: rust_alloc,
       __rust_dealloc: rust_dealloc,
     }, {
-      get(target, prop, receiver) {
+      get(target, prop, _receiver) {
 	if (prop in target) {
       	  return Reflect.get(...arguments);
       	}
@@ -45,7 +45,7 @@ async function run() {
   )
 
   hmr_import_obj.__wbindgen_placeholder__ = new Proxy(imports.wbg, {
-    get(target, prop, receiver) {
+    get(target, prop, _receiver) {
       if (prop in target) {
         return Reflect.get(...arguments);
       }

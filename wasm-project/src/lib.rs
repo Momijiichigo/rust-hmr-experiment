@@ -57,7 +57,6 @@ pub fn get_wasm_table() -> Object {
 
 #[wasm_bindgen]
 pub fn get_wasm_memory() -> Object {
-    let a = wasm_bindgen::__rt::link_mem_intrinsics;
     wasm_bindgen::memory().into()
 }
 
@@ -75,6 +74,12 @@ pub unsafe fn rust_dealloc(ptr: *mut u8, size: usize, align: usize) {
 }
 
 #[wasm_bindgen]
-pub unsafe fn handle_alloc_error(size: usize, align: usize) {
+pub unsafe fn std__alloc__handle_alloc_error(size: usize, align: usize) {
     std::alloc::handle_alloc_error(std::alloc::Layout::from_size_align(size, align).unwrap());
 }
+
+#[wasm_bindgen]
+pub fn wasm_bindgen____rt__link_mem_intrinsics() {
+    wasm_bindgen::__rt::link_mem_intrinsics();
+}
+
