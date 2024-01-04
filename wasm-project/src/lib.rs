@@ -1,10 +1,29 @@
 use js_sys::{Function, Object, Reflect, WebAssembly};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
-
+use std::*;
 mod mod1;
 mod utils;
 use utils::get_wasm;
+
+struct ModuleFuncs<const LEN: usize> {
+    place_holder_bytes: [u8; 5],
+    funcs: [(*const (), &'static str); LEN],
+}
+
+static MODULE_FUNCS: ModuleFuncs<2> = ModuleFuncs {
+    place_holder_bytes: [95, 95, 72, 77, 82],
+    funcs: [
+        (
+            &wasm_bindgen::__rt::link_mem_intrinsics as usize as *const (),
+            "wasm_bindgen::__rt::link_mem_intrinsics",
+        ),
+        (
+            &alloc::handle_alloc_error as usize as *const (),
+            "alloc::alloc::handle_alloc_error",
+        ),
+    ],
+};
 
 #[wasm_bindgen]
 extern "C" {
@@ -82,4 +101,3 @@ pub unsafe fn std__alloc__handle_alloc_error(size: usize, align: usize) {
 pub fn wasm_bindgen____rt__link_mem_intrinsics() {
     wasm_bindgen::__rt::link_mem_intrinsics();
 }
-

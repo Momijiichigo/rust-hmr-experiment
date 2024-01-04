@@ -1,5 +1,5 @@
 
-import init, { add, get_wasm_table, get_wasm_memory, rust_alloc, rust_dealloc, handle_alloc_error } from './pkg/wasm_project.js';
+import init, { add, get_wasm_table, get_wasm_memory, rust_alloc, rust_dealloc } from './pkg/wasm_project.js';
 
 
 const hmr_import_obj = {}
@@ -40,6 +40,7 @@ async function run() {
 	if (prop.includes("::describe::")) {
 	  return () => {};
 	}
+	
       }
     }
   )

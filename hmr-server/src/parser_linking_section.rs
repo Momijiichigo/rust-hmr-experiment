@@ -33,7 +33,7 @@ pub fn take_linking_section(input: &[u8]) -> IResult<&[u8], Vec<SymbolInfo>> {
 
     let mut syminfo_list = Vec::with_capacity(count as usize);
     let mut input = input;
-    for _ in 0..=count {
+    for _ in 0..count {
         let (i, syminfo) = take_syminfo(input)?;
         input = i;
         syminfo_list.push(syminfo);

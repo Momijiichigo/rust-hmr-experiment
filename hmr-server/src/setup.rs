@@ -1,4 +1,4 @@
-
+use anyhow::Context;
 use axum::{
     routing::{get, get_service},
     Router, Server,
@@ -17,7 +17,7 @@ fn config_set_target_dir(config: &mut Config) -> PathBuf {
         target_dir
     })
 }
-pub async fn setup(config: &mut Config) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
     let target_dir = config_set_target_dir(config);
     let target_web_assets_dir = target_dir.join("web-assets");
     let web_public_dir = config.project_dir.join("web-public");
@@ -30,8 +30,8 @@ pub async fn setup(config: &mut Config) -> Result<(), Box<dyn std::error::Error>
             let entry = entry?;
             let dest_path = format!(
                 "{}/{}",
-                &target_web_assets_dir.to_str().ok_or(ERR_MSG_PATH_TO_STR)?,
-                entry.file_name().to_str().ok_or(ERR_MSG_PATH_TO_STR)?
+                &target_web_assets_dir.to_str().context(ERR_MSG_PATH_TO_STR)?,
+                entry.file_name().to_str().context(ERR_MSG_PATH_TO_STR)?
             );
             fs::copy(entry.path(), dest_path)?;
         }
@@ -43,17 +43,17 @@ pub async fn setup(config: &mut Config) -> Result<(), Box<dyn std::error::Error>
             "build",
             #[cfg(feature = "debug-compilation-wasm-pack")]
             "--dev",
-            config.project_dir.to_str().ok_or(ERR_MSG_PATH_TO_STR)?,
+            config.project_dir.to_str().context(ERR_MSG_PATH_TO_STR)?,
             "--target",
             "web",
             "--out-dir",
             target_web_assets_dir
                 .join("pkg")
                 .to_str()
-                .ok_or(ERR_MSG_PATH_TO_STR)?,
+                .context(ERR_MSG_PATH_TO_STR)?,
         ])
         .status()
-        .expect("Failed to compile wasm-project");
+        .context("Failed to compile wasm-project")?;
     
     // Modify the generated JS glue file
     modify_glue::modify_glue_js(config)?;

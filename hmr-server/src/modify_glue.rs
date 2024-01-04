@@ -1,23 +1,25 @@
 use std::fs::{self, File};
 use std::io::{self, Write, BufReader, BufRead};
+use anyhow::Context;
+
 use crate::Config;
 
-pub fn modify_glue_js(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
+pub fn modify_glue_js(config: &Config) -> anyhow::Result<()> {
     let project_name = config.project_dir
         .file_name()
-        .ok_or("Project dir not set")?
+        .context("Project dir not set")?
         .to_str()
-        .ok_or("Failed to convert project dir to string")?
+        .context("Failed to convert project dir to string")?
         .replace('-', "_");
     let js_glue_file_path = config.target_dir
         .to_owned()
-        .ok_or("Target dir not set")?
+        .context("Target dir not set")?
         .join("web-assets")
         .join("pkg")
         .join(format!("{project_name}.js")); // Path to the generated JS glue file
     let temp_file_path = config.target_dir
         .to_owned()
-        .ok_or("Target dir not set")?
+        .context("Target dir not set")?
         .join("web-assets")
         .join("pkg")
         .join(format!("{project_name}.js.temp")); // Path to the temporary file

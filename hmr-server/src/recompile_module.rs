@@ -14,7 +14,11 @@ use std::{collections::HashSet, fs};
 use tower_http::services::ServeDir;
 use walrus::{IdsToIndices, Module};
 
-use crate::{parser_linking_section::take_linking_section, *};
+use crate::{
+    modify_wasm::{demangle, module_from_bytes},
+    parser_linking_section::take_linking_section,
+    *,
+};
 
 #[cfg(not(feature = "debug-compilation-wasm-pack"))]
 static WASM_PACK_COMPILATION_MODE: &str = "release";
@@ -117,43 +121,25 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
 
     let mut module =
         module_from_bytes(&fs::read(output_name)?).context("failed to parse bytes as wasm")?;
+    restore_export(&mut module)?;
+    demangle(&mut module);
 
     let output_name = target_dir
         .join("web-assets")
         .join("wasm")
         .join(mod_path)
         .with_extension("wasm");
-    add_export(&mut module)?;
-    demangle(&mut module);
     module.emit_wasm_file(output_name)?;
 
     Ok(())
 }
 
-fn module_from_bytes(bytes: &[u8]) -> anyhow::Result<Module> {
-    walrus::ModuleConfig::new()
-        .parse(bytes)
-        .context("failed to parse bytes as wasm")
-}
 
-fn demangle(module: &mut Module) {
-    for func in module.funcs.iter_mut() {
-        let name = match &func.name {
-            Some(name) => name,
-            None => continue,
-        };
-        if let Ok(sym) = rustc_demangle::try_demangle(name) {
-            func.name = Some(sym.to_string());
-        }
-    }
-    for import in module.imports.iter_mut() {
-        if let Ok(sym) = rustc_demangle::try_demangle(&import.name) {
-            import.name = sym.to_string();
-        }
-    }
-}
-
-fn add_export(module: &mut Module) -> anyhow::Result<()> {
+/// modifies and adds the function exports into the wasm object file,
+/// where the exports are omitted in the object file.
+///
+/// It uses the linking custom section to obtain the function names.
+fn restore_export(module: &mut Module) -> anyhow::Result<()> {
     let custom = module
         .customs
         .iter()
