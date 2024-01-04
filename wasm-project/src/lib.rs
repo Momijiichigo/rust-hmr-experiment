@@ -15,11 +15,11 @@ static MODULE_FUNCS: ModuleFuncs<2> = ModuleFuncs {
     place_holder_bytes: [95, 95, 72, 77, 82],
     funcs: [
         (
-            &wasm_bindgen::__rt::link_mem_intrinsics as usize as *const (),
+            &wasm_bindgen::__rt::link_mem_intrinsics as *const (),
             "wasm_bindgen::__rt::link_mem_intrinsics",
         ),
         (
-            &alloc::handle_alloc_error as usize as *const (),
+            &alloc::handle_alloc_error as *const (),
             "alloc::alloc::handle_alloc_error",
         ),
     ],
