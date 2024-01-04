@@ -22,14 +22,13 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
         - [x] parse Custom Linking section of wasm binary and obtain name map of functions
       - [x] demangle import & func names
     - [ ] pass in the host's memory & imports to instanciate `mod1.wasm`
-      - requires the modification of at least `lib.rs` so it will export necessary functions
-        - e.g. `alloc::alloc::handle_alloc_error`
-      - which means the program needs to make modified cargo project somewhere (prob under `target`)
-        - Not very bad idea since it might eventually be necessary in the future for code-mod plugins support
-    - **Obstacle**: requires a way to get a list of all functions to be exported from host
-      - the list could be obtained by parsing `rlib` file in `target/../deps` but spec is not documented
-    - **Obstacle**: 
-
+      - **Obstacle**: requires a way to get a list of all functions to be exported from the host wasm
+          - the list could be obtained by parsing `rlib` file in `target/../deps` but spec is not documented
+      - [ ] embed the (byte_index, func_name) map into the wasm binary by placing `static` map item in `lib.rs` 
+        - so the hmr server program can:
+        - 1. parse & read the map from generated wasm binary
+        - 2. modify the (host) wasm binary to make it export core functions with appropriate names
+        - **Obstacle**: Need to make `*const ()` thread safe in order to make it `static` value
   - Plan B: easier to implement (?)
     - generate separate js glue code using [wasm-bindgen-cli-support](https://docs.rs/wasm-bindgen-cli-support/latest/wasm_bindgen_cli_support/index.html)
     - or just make the copy of the glue code for host wasm
