@@ -12,6 +12,10 @@ struct ModuleFuncs<const LEN: usize> {
     funcs: [(*const (), &'static str); LEN],
 }
 
+// This is **safe** because the struct is never used by the program;
+// it is only used from the HMR server to parse the binary
+unsafe impl<const LEN: usize> Sync for ModuleFuncs<LEN> {}
+
 static MODULE_FUNCS: ModuleFuncs<2> = ModuleFuncs {
     place_holder_bytes: [95, 95, 72, 77, 82],
     funcs: [
