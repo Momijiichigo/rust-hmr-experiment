@@ -24,6 +24,8 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
     - [ ] pass in the host's memory & imports to instanciate `mod1.wasm`
       - **Obstacle**: requires a way to get a list of all functions to be exported from the host wasm
           - the list could be obtained by parsing `rlib` file in `target/../deps` but spec is not documented
+          - UPDATE - 01/05: `rlib` binary can be parsed as Static Library Archive format
+            - Inspecting the content in `rlib` .....
       - [ ] embed the (byte_index, func_name) map into the wasm binary by placing `static` map item in `lib.rs` 
         - so the hmr server program can:
         - 1. parse & read the map from generated wasm binary
