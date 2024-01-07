@@ -1,6 +1,7 @@
 
-import init, { add, get_wasm_table, get_wasm_memory, rust_alloc, rust_dealloc } from './pkg/wasm_project.js';
-
+import init, * as project from './pkg/wasm_project.js';
+window.project = project;
+const { add, get_wasm_table, get_wasm_memory } = project;
 
 const hmr_import_obj = {}
 window.__get_hmr_import_obj = () => hmr_import_obj;
@@ -27,16 +28,14 @@ async function run() {
     __wbindgen_externref_table_set_null: (idx) => wasmTable.set(idx),
   }
 
-  hmr_import_obj.env = new Proxy(
-    {
-      __linear_memory: wasmMemory,
-      __rust_alloc: rust_alloc,
-      __rust_dealloc: rust_dealloc,
-    }, {
+  hmr_import_obj.env = new Proxy(project, {
       get(target, prop, _receiver) {
 	if (prop in target) {
       	  return Reflect.get(...arguments);
       	}
+	if (prop === "__linear_memory") {
+	  return wasmMemory;
+	}
 	if (prop.includes("::describe::")) {
 	  return () => {};
 	}

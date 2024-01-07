@@ -8,6 +8,8 @@ use nom::{
     Err, IResult,
 };
 
+/// parses the linking section of a wasm binary.
+/// returns a list of symbol info
 pub fn take_linking_section(input: &[u8]) -> IResult<&[u8], Vec<SymbolInfo>> {
     // # version
     let (input, version) = take(1usize)(input)?;

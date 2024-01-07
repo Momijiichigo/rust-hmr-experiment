@@ -1,4 +1,4 @@
-use crate::parser_linking_section::SymbolInfo;
+use crate::{parser_linking_section::SymbolInfo, modify_wasm::demangle_imports};
 use anyhow::{Context, Error};
 use axum::{
     routing::{get, get_service},
@@ -15,7 +15,7 @@ use tower_http::services::ServeDir;
 use walrus::{IdsToIndices, Module};
 
 use crate::{
-    modify_wasm::{demangle, module_from_bytes},
+    modify_wasm::{demangle_funcs, module_from_bytes},
     parser_linking_section::take_linking_section,
     *,
 };
@@ -122,7 +122,8 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
     let mut module =
         module_from_bytes(&fs::read(output_name)?).context("failed to parse bytes as wasm")?;
     restore_export(&mut module)?;
-    demangle(&mut module);
+    demangle_funcs(&mut module);
+    demangle_imports(&mut module);
 
     let output_name = target_dir
         .join("web-assets")

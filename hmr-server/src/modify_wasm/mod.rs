@@ -9,7 +9,7 @@ pub fn module_from_bytes(bytes: &[u8]) -> anyhow::Result<Module> {
 }
 
 /// renames the function names and import names to the demangled names.
-pub fn demangle(module: &mut Module) {
+pub fn demangle_funcs(module: &mut Module) {
     for func in module.funcs.iter_mut() {
         let name = match &func.name {
             Some(name) => name,
@@ -19,10 +19,13 @@ pub fn demangle(module: &mut Module) {
             func.name = Some(sym.to_string());
         }
     }
+}
+
+pub fn demangle_imports(module: &mut Module) {
     for import in module.imports.iter_mut() {
         if let Ok(sym) = rustc_demangle::try_demangle(&import.name) {
             import.name = sym.to_string();
         }
     }
-}
 
+}

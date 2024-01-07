@@ -30,20 +30,53 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
             let entry = entry?;
             let dest_path = format!(
                 "{}/{}",
-                &target_web_assets_dir.to_str().context(ERR_MSG_PATH_TO_STR)?,
+                &target_web_assets_dir
+                    .to_str()
+                    .context(ERR_MSG_PATH_TO_STR)?,
                 entry.file_name().to_str().context(ERR_MSG_PATH_TO_STR)?
             );
             fs::copy(entry.path(), dest_path)?;
         }
     }
+    // erase target/web-assets/pkg directory
+    fs::remove_dir_all(target_web_assets_dir.join("pkg"))?;
 
-    // Compile wasm-project
-    Command::new("wasm-pack")
+    Command::new("cargo")
         .args([
             "build",
-            #[cfg(feature = "debug-compilation-wasm-pack")]
-            "--dev",
-            config.project_dir.to_str().context(ERR_MSG_PATH_TO_STR)?,
+            "--manifest-path",
+            config
+                .project_dir
+                .join("Cargo.toml")
+                .to_str()
+                .context(ERR_MSG_PATH_TO_STR)?,
+            "-Z",
+            "unstable-options",
+            "--out-dir",
+            target_web_assets_dir
+                .join("pkg")
+                .to_str()
+                .context(ERR_MSG_PATH_TO_STR)?,
+            "--target",
+            "wasm32-unknown-unknown",
+        ])
+        .status()
+        .context("Failed to compile cargo project")?;
+    let project_name = config
+        .project_dir
+        .file_name()
+        .context("failed to obtain project name")?
+        .to_str()
+        .context(ERR_MSG_PATH_TO_STR)?
+        .replace('-', "_");
+    let wasm_file_path = target_web_assets_dir
+        .join("pkg")
+        .join(project_name.clone())
+        .with_extension("wasm");
+    let wasm_file_path_str = wasm_file_path.to_str().context(ERR_MSG_PATH_TO_STR)?;
+
+    Command::new("wasm-bindgen")
+        .args([
             "--target",
             "web",
             "--out-dir",
@@ -51,13 +84,59 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
                 .join("pkg")
                 .to_str()
                 .context(ERR_MSG_PATH_TO_STR)?,
+            "--no-demangle",
+            "--keep-lld-exports",
+            &wasm_file_path_str,
         ])
         .status()
-        .context("Failed to compile wasm-project")?;
-    
+        .context("Failed to compile wasm-bindgen")?;
+
+    let bindgen_wasm_file_path = target_web_assets_dir
+        .join("pkg")
+        .join(format!("{project_name}_bg").clone())
+        .with_extension("wasm");
+
+    let mut module = modify_wasm::module_from_bytes(&fs::read(&bindgen_wasm_file_path)?)
+        .context("failed to parse bytes as wasm")?;
+    modify_wasm::demangle_funcs(&mut module);
+
+    let mut names = HashSet::new();
+    module.exports.iter().for_each(|export| {
+        names.insert(export.name.to_string());
+    });
+    module.funcs.iter_mut().for_each(|func| {
+        if let Some(name) = &func.name {
+            if !names.contains(name) {
+                module.exports.add(name.as_str(), func.id());
+                println!("exported: {}", name);
+                names.insert(name.to_string());
+            }
+        }
+    });
+    module.emit_wasm_file(&bindgen_wasm_file_path)?;
+
+    // Old: Compile wasm-project
+    // Command::new("wasm-pack")
+    //     .args([
+    //         "build",
+    //         #[cfg(feature = "debug-compilation-wasm-pack")]
+    //         "--dev",
+    //         config.project_dir.to_str().context(ERR_MSG_PATH_TO_STR)?,
+    //         "--target",
+    //         "web",
+    //         "--out-dir",
+    //         target_web_assets_dir
+    //             .join("pkg")
+    //             .to_str()
+    //             .context(ERR_MSG_PATH_TO_STR)?,
+    //         // "--no-demangle",
+    //         // "--keep-lld-exports",
+    //     ])
+    //     .status()
+    //     .context("Failed to compile wasm-project")?;
+
     // Modify the generated JS glue file
     modify_glue::modify_glue_js(config)?;
-
 
     Ok(())
 }

@@ -84,25 +84,25 @@ pub fn get_wasm_memory() -> Object {
     wasm_bindgen::memory().into()
 }
 
-#[wasm_bindgen]
-pub unsafe fn rust_alloc(size: usize, align: usize) -> *mut u8 {
-    std::alloc::alloc(std::alloc::Layout::from_size_align(size, align).unwrap())
-}
+// #[wasm_bindgen]
+// pub unsafe fn rust_alloc(size: usize, align: usize) -> *mut u8 {
+//     std::alloc::alloc(std::alloc::Layout::from_size_align(size, align).unwrap())
+// }
+// 
+// #[wasm_bindgen]
+// pub unsafe fn rust_dealloc(ptr: *mut u8, size: usize, align: usize) {
+//     std::alloc::dealloc(
+//         ptr,
+//         std::alloc::Layout::from_size_align(size, align).unwrap(),
+//     )
+// }
 
-#[wasm_bindgen]
-pub unsafe fn rust_dealloc(ptr: *mut u8, size: usize, align: usize) {
-    std::alloc::dealloc(
-        ptr,
-        std::alloc::Layout::from_size_align(size, align).unwrap(),
-    )
-}
-
-#[wasm_bindgen]
-pub unsafe fn std__alloc__handle_alloc_error(size: usize, align: usize) {
-    std::alloc::handle_alloc_error(std::alloc::Layout::from_size_align(size, align).unwrap());
-}
-
-#[wasm_bindgen]
-pub fn wasm_bindgen____rt__link_mem_intrinsics() {
-    wasm_bindgen::__rt::link_mem_intrinsics();
-}
+// #[wasm_bindgen]
+// pub unsafe fn std__alloc__handle_alloc_error(size: usize, align: usize) {
+//     std::alloc::handle_alloc_error(std::alloc::Layout::from_size_align(size, align).unwrap());
+// }
+// 
+// #[wasm_bindgen]
+// pub fn wasm_bindgen____rt__link_mem_intrinsics() {
+//     wasm_bindgen::__rt::link_mem_intrinsics();
+// }
