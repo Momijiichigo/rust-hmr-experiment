@@ -1,4 +1,4 @@
-use crate::{parser_linking_section::SymbolInfo, modify_wasm::demangle_imports};
+use crate::{modify_wasm::demangle_imports, parser_linking_section::SymbolInfo};
 use anyhow::{Context, Error};
 use axum::{
     routing::{get, get_service},
@@ -41,7 +41,7 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
                 // read file
                 let file = fs::read_to_string(entry)?;
 
-                file.split(&[' ', '\n']).for_each(|line| {
+                for line in file.split(&[' ', '\n']) {
                     if line.contains(".cargo/registry") {
                         let crate_path = PathBuf::from(line);
                         // strip `/src/...` from the path
@@ -50,28 +50,28 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
                             if crate_path.ends_with("src") {
                                 break;
                             }
-                            crate_path = crate_path.parent().unwrap();
+                            crate_path =
+                                crate_path.parent().context("could not get parent path")?;
                         }
-                        let crate_path = crate_path.parent().unwrap();
+                        let crate_path =
+                            crate_path.parent().context("could not get parent path")?;
                         // strip version at the end of the name
                         let crate_name = crate_path
                             .file_name()
-                            .unwrap()
+                            .context("could not get file name")?
                             .to_str()
-                            .unwrap()
+                            .context("could not convert to str")?
                             .split('-')
                             .filter(|s| s.chars().next().unwrap().is_alphabetic())
                             .collect::<Vec<&str>>()
                             .join("_");
                         library_names.insert(crate_name.clone());
-                        library_paths.insert(format!("{}/src", crate_path.to_str().unwrap()));
-                        // library_paths.insert(format!(
-                        //     "{}={}",
-                        //     crate_name,
-                        //     crate_path.to_str().unwrap().to_string(),
-                        // ));
+                        library_paths.insert(format!(
+                            "{}/src",
+                            crate_path.to_str().context("could not convert to str")?
+                        ));
                     }
-                });
+                }
             }
         }
     }
@@ -135,7 +135,6 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
     Ok(())
 }
 
-
 /// modifies and adds the function exports into the wasm object file,
 /// where the exports are omitted in the object file.
 ///
@@ -161,12 +160,9 @@ fn restore_export(module: &mut Module) -> anyhow::Result<()> {
         .collect();
 
     module.funcs.iter_mut().for_each(|func| {
-        // println!("func: {:?}", func);
-        // println!("func: {:?}", func.name);
         for syminfo in funcs.iter() {
             if let SymbolInfo::Function(idx, Some(name), false) = syminfo {
                 if *idx as usize == func.id().index() {
-                    // func.name = Some(name.clone());
                     module.exports.add(&name, func.id());
                     break;
                 }

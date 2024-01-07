@@ -59,6 +59,7 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
                 .context(ERR_MSG_PATH_TO_STR)?,
             "--target",
             "wasm32-unknown-unknown",
+            "--release",
         ])
         .status()
         .context("Failed to compile cargo project")?;
@@ -108,7 +109,6 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
         if let Some(name) = &func.name {
             if !names.contains(name) {
                 module.exports.add(name.as_str(), func.id());
-                println!("exported: {}", name);
                 names.insert(name.to_string());
             }
         }
