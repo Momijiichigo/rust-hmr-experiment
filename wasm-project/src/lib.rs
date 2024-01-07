@@ -7,28 +7,6 @@ mod utils;
 use utils::get_wasm;
 use std::sync::Mutex;
 
-struct ModuleFuncs<const LEN: usize> {
-    place_holder_bytes: [u8; 5],
-    funcs: [(*const (), &'static str); LEN],
-}
-
-// This is **safe** because the struct is never used by the program;
-// it is only used from the HMR server to parse the binary
-unsafe impl<const LEN: usize> Sync for ModuleFuncs<LEN> {}
-
-static MODULE_FUNCS: ModuleFuncs<2> = ModuleFuncs {
-    place_holder_bytes: [95, 95, 72, 77, 82],
-    funcs: [
-        (
-            wasm_bindgen::__rt::link_mem_intrinsics as *const (),
-            "wasm_bindgen::__rt::link_mem_intrinsics",
-        ),
-        (
-            alloc::handle_alloc_error as *const (),
-            "alloc::alloc::handle_alloc_error",
-        ),
-    ],
-};
 
 #[wasm_bindgen]
 extern "C" {
@@ -51,9 +29,9 @@ fn run() {
 }
 
 async fn main() -> Result<(), JsValue> {
-    log!("Hello, world!");
+    log!("Hello from main wasm!!");
 
-    mod1::component_a();
+    // mod1::component_a();
 
     let instance = get_wasm("wasm/mod1.wasm").await?;
     log!("Got wasm instance");
@@ -64,15 +42,6 @@ async fn main() -> Result<(), JsValue> {
     Ok(())
 }
 
-#[wasm_bindgen]
-pub fn add(a: i32, b: i32) -> i32 {
-    a + b
-}
-
-// #[wasm_bindgen]
-// pub fn get_imports() -> Object {
-//     __wbg_get_imports().into()
-// }
 
 #[wasm_bindgen]
 pub fn get_wasm_table() -> Object {

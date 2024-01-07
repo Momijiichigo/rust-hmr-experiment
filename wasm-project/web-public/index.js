@@ -1,7 +1,5 @@
 
-import init, * as project from './pkg/wasm_project.js';
-window.project = project;
-const { add, get_wasm_table, get_wasm_memory } = project;
+import init, { get_wasm_table, get_wasm_memory } from './pkg/wasm_project.js';
 
 const hmr_import_obj = {}
 window.__get_hmr_import_obj = () => hmr_import_obj;
@@ -18,7 +16,7 @@ window.__get_hmr_import_obj = () => hmr_import_obj;
 */
 
 async function run() {
-  await init();
+  window.project = await init();
   window.wasmTable = get_wasm_table();
   window.wasmMemory = get_wasm_memory();
   window.imports = __wbg_get_imports();
@@ -28,7 +26,8 @@ async function run() {
     __wbindgen_externref_table_set_null: (idx) => wasmTable.set(idx),
   }
 
-  hmr_import_obj.env = new Proxy(project, {
+  hmr_import_obj.env = new Proxy(
+    project, {
       get(target, prop, _receiver) {
 	if (prop in target) {
       	  return Reflect.get(...arguments);
@@ -39,7 +38,9 @@ async function run() {
 	if (prop.includes("::describe::")) {
 	  return () => {};
 	}
-	
+	if (prop.indexOf("wasm_bindgen::__rt::link_mem_intrinsics") === 0) {
+	  return () => {};
+	}	
       }
     }
   )
@@ -55,7 +56,7 @@ async function run() {
       const pkgName = prop.substring(0, prop.length-16);
       const [foundPkgName, foundFunc] = Object
         .entries(imports.wbg)
-        .find(([name, f]) => name.includes(pkgName));
+        .find(([name, _f]) => name.includes(pkgName));
       if (foundPkgName) {
         target[foundPkgName] = foundFunc;
         return foundFunc;
@@ -64,7 +65,6 @@ async function run() {
     },
   });
 
-  console.log(add(1, 2));
 }
 
 run();

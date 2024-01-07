@@ -15,5 +15,5 @@ macro_rules! log {
 #[no_mangle]
 #[wasm_bindgen]
 pub fn component_a() {
-    log!("Hello mod1");
+    log!("Hello from mod1.wasm!!");
 }
