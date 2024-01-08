@@ -1,12 +1,11 @@
 use js_sys::{Function, Object, Reflect, WebAssembly};
+use std::*;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
-use std::*;
 mod mod1;
 mod utils;
+use leptos::*;
 use utils::get_wasm;
-use std::sync::Mutex;
-
 
 #[wasm_bindgen]
 extern "C" {
@@ -26,6 +25,13 @@ fn run() {
     spawn_local(async {
         main().await.unwrap_throw();
     });
+    mount_to_body(|| {
+        view! {
+            <div>
+                "Hello from leptos!"
+            </div>
+        }
+    })
 }
 
 async fn main() -> Result<(), JsValue> {
@@ -42,7 +48,6 @@ async fn main() -> Result<(), JsValue> {
     Ok(())
 }
 
-
 #[wasm_bindgen]
 pub fn get_wasm_table() -> Object {
     wasm_bindgen::function_table().into()
@@ -52,4 +57,3 @@ pub fn get_wasm_table() -> Object {
 pub fn get_wasm_memory() -> Object {
     wasm_bindgen::memory().into()
 }
-

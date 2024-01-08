@@ -22,7 +22,8 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
     let target_web_assets_dir = target_dir.join("web-assets");
     let web_public_dir = config.project_dir.join("web-public");
     // Ensure target/web-assets directory exists
-    fs::create_dir_all(target_web_assets_dir.join("wasm"))?;
+    fs::create_dir_all(target_web_assets_dir.join("wasm"))
+        .context("could not create dir: `target/web-assets/wasm`")?;
 
     // Copy files from web-public to target/web-assets
     if let Ok(entries) = fs::read_dir(web_public_dir) {
@@ -35,11 +36,18 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
                     .context(ERR_MSG_PATH_TO_STR)?,
                 entry.file_name().to_str().context(ERR_MSG_PATH_TO_STR)?
             );
-            fs::copy(entry.path(), dest_path)?;
+            fs::copy(entry.path(), dest_path).context("could not copy file")?;
         }
     }
     // erase target/web-assets/pkg directory
-    fs::remove_dir_all(target_web_assets_dir.join("pkg"))?;
+    match fs::remove_dir_all(target_web_assets_dir.join("pkg")) {
+        Ok(_) => {}
+        Err(e) => {
+            if e.kind() != std::io::ErrorKind::NotFound {
+                Err(e).context("could not remove dir: `target/web-assets/pkg`")?;
+            }
+        }
+    }
 
     Command::new("cargo")
         .args([
@@ -97,8 +105,10 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
         .join(format!("{project_name}_bg").clone())
         .with_extension("wasm");
 
-    let mut module = modify_wasm::module_from_bytes(&fs::read(&bindgen_wasm_file_path)?)
-        .context("failed to parse bytes as wasm")?;
+    let mut module = modify_wasm::module_from_bytes(
+        &fs::read(&bindgen_wasm_file_path).context("could not read bindgen_wasm_file_path")?,
+    )
+    .context("failed to parse bytes as wasm")?;
     modify_wasm::demangle_funcs(&mut module);
 
     let mut names = HashSet::new();

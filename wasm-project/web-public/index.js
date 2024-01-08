@@ -25,6 +25,9 @@ async function run() {
 	if (prop === "__linear_memory") {
 	  return wasmMemory;
 	}
+	if (prop === "__stack_pointer") {
+	  return new WebAssembly.Global({value: "i32", mutable: true}, window.heap_next);
+	}
 	if (prop.includes("::describe::")) {
 	  return () => {};
 	}

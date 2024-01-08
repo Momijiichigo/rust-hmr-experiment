@@ -32,14 +32,28 @@ pub fn modify_glue_js(config: &Config) -> anyhow::Result<()> {
     // Open a temporary file for writing
     let mut temp_file = File::create(&temp_file_path)?;
 
+    let mod_funcs = [
+        globalize_get_imports,
+        globalize_stack_pointer
+    ];
     for line in reader.lines() {
         let line = line?;
-        if line.trim() == "function __wbg_get_imports() {" {
-            // Write the modified line
-            writeln!(temp_file, "window.__wbg_get_imports = function() {{")?;
-        } else {
-            // Write the line as is
-            writeln!(temp_file, "{}", line)?;
+        let line = line.trim();
+        let mut result_line = ModLine::NoChange;
+
+        for func in mod_funcs.iter() {
+            result_line = func(line);
+            if let ModLine::Change(_) = result_line {
+                break;
+            }
+        }
+        match result_line {
+            ModLine::Change(line) => {
+                writeln!(temp_file, "{}", line)?;
+            }
+            ModLine::NoChange => {
+                writeln!(temp_file, "{}", line)?;
+            }
         }
     }
 
@@ -47,4 +61,22 @@ pub fn modify_glue_js(config: &Config) -> anyhow::Result<()> {
     fs::rename(temp_file_path, js_glue_file_path)?;
 
     Ok(())
+}
+enum ModLine {
+    Change(String),
+    NoChange,
+}
+fn globalize_get_imports(line: &str) -> ModLine {
+    if line == "function __wbg_get_imports() {" {
+        ModLine::Change("window.__wbg_get_imports = function() {".to_string())
+    } else {
+        ModLine::NoChange
+    }
+}
+fn globalize_stack_pointer(line: &str) -> ModLine {
+    if line == "let heap_next = heap.length;" {
+        ModLine::Change("window.heap_next = heap.length;".to_string())
+    } else {
+        ModLine::NoChange
+    }
 }

@@ -1,6 +1,7 @@
 use js_sys::{Function, Object, Reflect, WebAssembly};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
+use leptos::*;
 
 #[wasm_bindgen]
 extern "C" {

@@ -11,6 +11,7 @@ web-sys = { version = "0.3.66", features = ["console", "Window", "Response"] }
 js-sys = "0.3.66"
 wasm-bindgen-futures = "0.4.39"
 static_cell = "2.0"
+leptos = { version = "0.5", features = ["csr", "nightly"] }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
