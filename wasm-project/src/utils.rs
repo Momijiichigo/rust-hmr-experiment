@@ -17,7 +17,7 @@ pub async fn get_wasm(mod_path: &str) -> Result<WebAssembly::Instance, JsValue> 
         &resp,
         &__get_hmr_import_obj(),
     ))
-    .await.unwrap_throw();
+    .await?;
     let instance: WebAssembly::Instance = Reflect::get(&wasm, &"instance".into())?.dyn_into()?;
     Ok(instance)
 }

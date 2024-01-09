@@ -97,6 +97,10 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
         "cdylib",
         "--emit",
         "obj",
+        //--- experimenting --
+        "--cfg",
+        "feature=\"leptos?/csr\"",
+        // ------
         "-L",
         dep_wasm_path.to_str().context(ERR_MSG_PATH_TO_STR)?,
         "-L",

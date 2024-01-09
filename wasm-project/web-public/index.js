@@ -1,5 +1,5 @@
 
-import init, { get_wasm_table, get_wasm_memory } from './pkg/wasm_project.js';
+import init, { get_wasm_table } from './pkg/wasm_project.js';
 
 const hmr_import_obj = {}
 window.__get_hmr_import_obj = () => hmr_import_obj;
@@ -8,7 +8,6 @@ async function run() {
   // keep these public for debugging
   window.project = await init();
   window.wasmTable = get_wasm_table();
-  window.wasmMemory = get_wasm_memory();
   window.imports = __wbg_get_imports();
 
   hmr_import_obj.__wbindgen_externref_xform__ = {
@@ -23,17 +22,22 @@ async function run() {
       	  return Reflect.get(...arguments);
       	}
 	if (prop === "__linear_memory") {
-	  return wasmMemory;
+	  return project.memory;
 	}
 	if (prop === "__stack_pointer") {
+	  // TODO: using wrong value, need fix
 	  return new WebAssembly.Global({value: "i32", mutable: true}, window.heap_next);
 	}
+	if (prop === "__indirect_function_table") {
+	  return wasmTable;
+	}
+
 	if (prop.includes("::describe::")) {
 	  return () => {};
 	}
 	if (prop.indexOf("wasm_bindgen::__rt::link_mem_intrinsics") === 0) {
 	  return () => {};
-	}	
+	}
       }
     }
   )

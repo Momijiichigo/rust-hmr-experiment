@@ -34,7 +34,8 @@ pub fn modify_glue_js(config: &Config) -> anyhow::Result<()> {
 
     let mod_funcs = [
         globalize_get_imports,
-        globalize_stack_pointer
+        globalize_stack_pointer,
+        globalize_heap,
     ];
     for line in reader.lines() {
         let line = line?;
@@ -76,6 +77,14 @@ fn globalize_get_imports(line: &str) -> ModLine {
 fn globalize_stack_pointer(line: &str) -> ModLine {
     if line == "let heap_next = heap.length;" {
         ModLine::Change("window.heap_next = heap.length;".to_string())
+    } else {
+        ModLine::NoChange
+    }
+}
+
+fn globalize_heap(line: &str) -> ModLine {
+    if line == "const heap = new Array(128).fill(undefined);" {
+        ModLine::Change("window.heap = new Array(128).fill(undefined);".to_string())
     } else {
         ModLine::NoChange
     }

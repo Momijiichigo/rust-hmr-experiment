@@ -15,6 +15,27 @@ macro_rules! log {
 
 #[no_mangle]
 #[wasm_bindgen]
-pub fn component_a() {
+pub fn func_a() {
     log!("Hello from mod1.wasm!!");
+}
+
+#[component]
+pub fn ComponentA() -> impl IntoView {
+    view! {
+        <div>
+            "Hello from ComponentA!"
+        </div>
+    }
+}
+
+#[wasm_bindgen]
+pub fn ComponentA_into_view() -> _View {
+    _View {
+        view: ComponentA().into_view(),
+    }
+}
+
+#[wasm_bindgen]
+pub struct _View {
+    view: View,
 }

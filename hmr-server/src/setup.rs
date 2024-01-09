@@ -123,6 +123,13 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
             }
         }
     });
+    module.globals.iter().for_each(|global| {
+        // TODO: change to reliable way to detect stack pointer
+        // by parsing the custom section
+        if matches!(global, walrus::Global { ty: walrus::ValType::I32, mutable: true, .. }) {
+            module.exports.add("__stack_pointer", global.id());
+        }
+    });
     module.emit_wasm_file(&bindgen_wasm_file_path)?;
 
     // Old: Compile wasm-project
