@@ -3,7 +3,7 @@ use nom::{
     character::complete::char,
     character::is_digit,
     combinator::map_res,
-    error::{Error, ContextError, ErrorKind, ParseError},
+    error::{ContextError, Error, ErrorKind, ParseError},
     sequence::{delimited, tuple},
     Err, IResult,
 };
@@ -74,13 +74,19 @@ fn take_var_uint_32(input: &[u8]) -> IResult<&[u8], u32> {
 }
 
 #[derive(Debug)]
+pub struct GeneralSymbol {
+    pub idx: u32,
+    pub name: Option<String>,
+    pub is_imported: bool,
+}
+#[derive(Debug)]
 pub enum SymbolInfo {
-    Function(u32, Option<String>, bool),
-    Data(Option<u32>, String),
-    Global(u32, Option<String>, bool),
+    Function(GeneralSymbol),
+    Data { idx: Option<u32>, name: String },
+    Global(GeneralSymbol),
     Section(u32),
-    Event(u32, Option<String>, bool),
-    Table(u32, Option<String>, bool),
+    Event(GeneralSymbol),
+    Table(GeneralSymbol),
 }
 fn take_syminfo(input: &[u8]) -> IResult<&[u8], SymbolInfo> {
     let (input, kind) = take(1usize)(input)?;
@@ -91,36 +97,51 @@ fn take_syminfo(input: &[u8]) -> IResult<&[u8], SymbolInfo> {
         0x00 => {
             let (input, (idx, name, is_imported)) = take_general_symbol(remaining, flags)?;
             remaining = input;
-            SymbolInfo::Function(idx, name, is_imported)
+            SymbolInfo::Function(GeneralSymbol {
+                idx,
+                name,
+                is_imported,
+            })
         }
         0x01 => {
             let (input, (idx, name)) = take_data_symbol(remaining, flags)?;
             remaining = input;
-            SymbolInfo::Data(idx, name)
-        },
+            SymbolInfo::Data { idx, name }
+        }
         0x02 => {
             let (input, (idx, name, is_imported)) = take_general_symbol(remaining, flags)?;
             remaining = input;
-            SymbolInfo::Global(idx, name, is_imported)
-        },
+            SymbolInfo::Global(GeneralSymbol {
+                idx,
+                name,
+                is_imported,
+            })
+        }
         0x03 => {
             let (input, idx) = take_var_uint_32(remaining)?;
             remaining = input;
             SymbolInfo::Section(idx)
-        },
+        }
         0x04 => {
             let (input, (idx, name, is_imported)) = take_general_symbol(remaining, flags)?;
             remaining = input;
-            SymbolInfo::Event(idx, name, is_imported)
-        },
+            SymbolInfo::Event(GeneralSymbol {
+                idx,
+                name,
+                is_imported,
+            })
+        }
         0x05 => {
             let (input, (idx, name, is_imported)) = take_general_symbol(remaining, flags)?;
             remaining = input;
-            SymbolInfo::Table(idx, name, is_imported)
-        },
+            SymbolInfo::Table(GeneralSymbol {
+                idx,
+                name,
+                is_imported,
+            })
+        }
         _ => return error_with_context(input, "invalid symbol kind"),
     };
-
 
     Ok((remaining, kind))
 }
@@ -163,9 +184,12 @@ fn take_data_symbol(input: &[u8], flags: u32) -> IResult<&[u8], (Option<u32>, St
         remaining = input;
     }
 
-
     Ok((remaining, (idx, name)))
 }
-fn error_with_context<I: Copy,O>(input: I, msg: &'static str) -> IResult<I,O,Error<I>> {
-    Err(Err::Error(ContextError::add_context(input, msg, Error::new(input, ErrorKind::Fail))))
+fn error_with_context<I: Copy, O>(input: I, msg: &'static str) -> IResult<I, O, Error<I>> {
+    Err(Err::Error(ContextError::add_context(
+        input,
+        msg,
+        Error::new(input, ErrorKind::Fail),
+    )))
 }

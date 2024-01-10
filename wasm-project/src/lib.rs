@@ -95,20 +95,20 @@ async fn main() -> Result<(), JsValue> {
     let component_a: Function = Reflect::get(exports.as_ref(), &"func_a".into())?.dyn_into()?;
     log!("marker 0");
 
-    // component_a.call0(&JsValue::null())?;
+    component_a.call0(&JsValue::null())?;
 
-    // log!("marker A");
-    // let component_a: Function = Reflect::get(exports.as_ref(), &"ComponentA_into_view".into())?.dyn_into()?;
-    // log!("marker B");
-    // unsafe {
-    //     let raw_component_address: u32 = std::mem::transmute(
-    //         component_a
-    //             .call0(&JsValue::null())
-    //             .expect_throw("failed to construct component a"),
-    //     );
-    //     log!("raw_component_address: {}", raw_component_address);
-    // };
-    // log!("marker C");
+    log!("marker A");
+    let component_a: Function = Reflect::get(exports.as_ref(), &"ComponentA_into_view".into())?.dyn_into()?;
+    log!("marker B");
+    unsafe {
+        let raw_component_address: u32 = std::mem::transmute(
+            component_a
+                .call0(&JsValue::null())
+                .expect_throw("failed to construct component a"),
+        );
+        log!("raw_component_address: {}", raw_component_address);
+    };
+    log!("marker C");
     Ok(())
 }
 

@@ -1,4 +1,7 @@
-use crate::{modify_wasm::demangle_imports, parser_linking_section::SymbolInfo};
+use crate::{
+    modify_wasm::demangle_imports,
+    parser_linking_section::{self, GeneralSymbol, SymbolInfo},
+};
 use anyhow::{Context, Error};
 use axum::{
     routing::{get, get_service},
@@ -158,18 +161,30 @@ fn restore_export(module: &mut Module) -> anyhow::Result<()> {
     println!("remain_bytes: {:?}", remain_bytes);
     println!("info_list: {:?}", info_list);
 
-    let funcs: Vec<_> = info_list
+    struct FuncToExport {
+        idx: u32,
+        name: String,
+    }
+    let funcs_to_be_exported: Vec<_> = info_list
         .into_iter()
-        .filter(|syminfo| matches!(syminfo, SymbolInfo::Function(_, Some(_), false)))
+        .filter_map(|syminfo| match syminfo {
+            // the functions should
+            // - have a name
+            // - not be imported
+            SymbolInfo::Function(GeneralSymbol {
+                idx,
+                name: Some(name),
+                is_imported: false,
+            }) => Some(FuncToExport { idx, name }),
+            _ => None,
+        })
         .collect();
-
+    // add exports on the non-imported functions
     module.funcs.iter_mut().for_each(|func| {
-        for syminfo in funcs.iter() {
-            if let SymbolInfo::Function(idx, Some(name), false) = syminfo {
-                if *idx as usize == func.id().index() {
-                    module.exports.add(&name, func.id());
-                    break;
-                }
+        for FuncToExport { idx, name } in funcs_to_be_exported.iter() {
+            if *idx as usize == func.id().index() {
+                module.exports.add(name, func.id());
+                break;
             }
         }
     });

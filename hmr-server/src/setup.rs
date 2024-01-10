@@ -132,26 +132,6 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
     });
     module.emit_wasm_file(&bindgen_wasm_file_path)?;
 
-    // Old: Compile wasm-project
-    // Command::new("wasm-pack")
-    //     .args([
-    //         "build",
-    //         #[cfg(feature = "debug-compilation-wasm-pack")]
-    //         "--dev",
-    //         config.project_dir.to_str().context(ERR_MSG_PATH_TO_STR)?,
-    //         "--target",
-    //         "web",
-    //         "--out-dir",
-    //         target_web_assets_dir
-    //             .join("pkg")
-    //             .to_str()
-    //             .context(ERR_MSG_PATH_TO_STR)?,
-    //         // "--no-demangle",
-    //         // "--keep-lld-exports",
-    //     ])
-    //     .status()
-    //     .context("Failed to compile wasm-project")?;
-
     // Modify the generated JS glue file
     modify_glue::modify_glue_js(config)?;
 
