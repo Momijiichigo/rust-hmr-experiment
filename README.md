@@ -22,6 +22,7 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
       - [x] parse Custom Linking section of wasm binary and obtain name map of functions
     - [x] demangle import & func names
   - [x] pass in the host's memory & imports to instanciate `mod1.wasm`
-- [ ] HMR (without Leptos)
-- [ ] HMR (with Leptos)
+- [ ] HMR with Leptos
+  - [ ] send `View` from `mod1.wasm` to main wasm
+    - Error: unreachable: `mod1.wasm` calling `env.core::result::unwrap_failed`
 - [ ] rust source modifier plugin (for activating HMR thru plugin interface)
