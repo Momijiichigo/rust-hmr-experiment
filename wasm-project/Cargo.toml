@@ -12,6 +12,7 @@ js-sys = "0.3.66"
 wasm-bindgen-futures = "0.4.39"
 static_cell = "2.0"
 leptos = { version = "0.5", features = ["csr", "nightly"] }
+leptos_reactive = "0.5"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

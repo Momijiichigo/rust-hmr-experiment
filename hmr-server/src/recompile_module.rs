@@ -101,8 +101,10 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
         "--emit",
         "obj",
         //--- experimenting --
-        "--cfg",
-        "feature=\"leptos?/csr\"",
+        // "--cfg",
+        // "feature=\"leptos?/csr\"",
+        // "--cfg",
+        // "feature=\"leptos?/nightly\"",
         // ------
         "-L",
         dep_wasm_path.to_str().context(ERR_MSG_PATH_TO_STR)?,

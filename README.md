@@ -25,4 +25,12 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
 - [ ] HMR with Leptos
   - [ ] send `View` from `mod1.wasm` to main wasm
     - Error: unreachable: `mod1.wasm` invoking `env.core::result::unwrap_failed`
+    - It is found that the error occurs at:
+```rs
+leptos_reactive::untrack_with_diagnostics(|| {
+    ComponentA()
+});
+```
+    - where the `ComponentA` returns `impl IntoView`
+    - continuing investigation...
 - [ ] rust source modifier plugin (for activating HMR thru plugin interface)

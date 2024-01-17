@@ -21,6 +21,7 @@ pub fn func_a() {
 
 #[component]
 pub fn ComponentA() -> impl IntoView {
+    log!("Hello from ComponentA!");
     view! {
         <div>
             "Hello from ComponentA!"
@@ -28,8 +29,22 @@ pub fn ComponentA() -> impl IntoView {
     }
 }
 
+#[allow(non_snake_case, dead_code, clippy::too_many_arguments)]
+pub fn __Comp1() -> impl IntoView {
+    {
+        {
+            let _ = ::leptos::leptos_dom::html::div;
+            ::leptos::leptos_dom::html::div()
+        }
+    }
+}
 #[wasm_bindgen]
 pub fn ComponentA_into_view() -> _View {
+    log!("Before exec");
+    let _ = leptos_reactive::untrack_with_diagnostics(|| {
+        ComponentA()
+    });
+    log!("After exec");
     _View {
         view: ComponentA().into_view(),
     }

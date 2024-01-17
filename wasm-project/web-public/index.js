@@ -18,6 +18,23 @@ async function run() {
   hmr_import_obj.env = new Proxy(
     project, {
       get(target, prop, _receiver) {
+	// --- debugging purpose ---
+	
+	if (prop.indexOf("leptos_dom::components::ComponentRepr::new_with_id_concrete") === 0) {
+	  console.log("new_with_id called");
+	  return (...args) => {
+	    console.log("new_with_id_concrete", args);
+	    return Reflect.get(...arguments)(...args);
+	  }
+	}
+	if (prop.indexOf("<leptos_dom::components::ComponentRepr as leptos_dom::IntoView>::into_view") === 0) {
+	  console.log("into_view called");
+	  return (...args) => {
+	    console.log("ComponentRepr::into_view", args);
+	    return Reflect.get(...arguments)(...args);
+	  }
+	}
+	// -------------------------
 	if (prop in target) {
       	  return Reflect.get(...arguments);
       	}

@@ -8,7 +8,7 @@ pub fn module_from_bytes(bytes: &[u8]) -> anyhow::Result<Module> {
         .context("failed to parse bytes as wasm")
 }
 
-/// renames the function names and import names to the demangled names.
+/// renames the function and import names into the demangled names.
 pub fn demangle_funcs(module: &mut Module) {
     for func in module.funcs.iter_mut() {
         let name = match &func.name {
