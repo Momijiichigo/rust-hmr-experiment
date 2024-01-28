@@ -28,9 +28,23 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
     - It is found that the error occurs at:
     - ```rs
       leptos_reactive::untrack_with_diagnostics(|| {
-          ComponentA()
+          __ComponentA().into_view()
       });
       ```
-    - where the `ComponentA` returns `impl IntoView`
+    - where the `__ComponentA` returns `impl IntoView`
     - continuing investigation...
+    - 
+```rs
+use leptos_reactive::runtime::*; // <- private module, idk how to investigate inside...
+// so far, I found that somewhere in the lines below has the casuse of the error
+Runtime::current().untrack(|| with_runtime(|| {
+            let untracked_result;
+
+            #[cfg(debug_assertions)]
+            let prev = false;
+
+            let prev_observer =
+                SetObserverOnDrop(self, runtime.observer.take());
+}));
+```
 - [ ] rust source modifier plugin (for activating HMR thru plugin interface)

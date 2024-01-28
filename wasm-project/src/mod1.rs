@@ -31,29 +31,30 @@ pub fn ComponentA() -> impl IntoView {
 
 #[allow(non_snake_case, dead_code, clippy::too_many_arguments)]
 pub fn __Comp1() -> impl IntoView {
-    {
-        {
-            let _ = ::leptos::leptos_dom::html::div;
-            ::leptos::leptos_dom::html::div()
-        }
+    view! {
+        <div>
+            "Hello from ComponentA!"
+        </div>
     }
 }
 pub fn test_comp() -> impl IntoView {
-    {
-        {
-            let _ = ::leptos::leptos_dom::html::div;
-            ::leptos::leptos_dom::html::div()
-        }
-    }
+    leptos_dom::Component::new("Test", move || __Comp1())
 }
 #[wasm_bindgen]
 pub fn ComponentA_into_view() -> _View {
-    log!("Before exec");
-    let val = leptos_dom::Component::new("test", test_comp).into_view();
-    log!("{:?}", val);
-    // let _ = leptos_reactive::untrack_with_diagnostics(|| {
-    //     ComponentA()
+    log!("Before exec...");
+    // let val = test_comp().into_view();
+    // let val = __Comp1().into_view();
+
+    // let val = leptos_reactive::untrack_with_diagnostics(|| {
+    //     __Comp1().into_view()
     // });
+    let val = leptos_reactive::untrack(|| {
+        log!("In untrack");
+        // __Comp1().into_view()
+    });
+    
+    log!("{:?}", val);
     log!("After exec");
     _View {
         view: ComponentA().into_view(),
