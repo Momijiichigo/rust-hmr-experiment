@@ -37,14 +37,15 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
 ```rs
 use leptos_reactive::runtime::*; // <- private module, idk how to investigate inside...
 // so far, I found that somewhere in the lines below has the casuse of the error
-Runtime::current().untrack(|| with_runtime(|| {
-            let untracked_result;
-
-            #[cfg(debug_assertions)]
-            let prev = false;
-
-            let prev_observer =
-                SetObserverOnDrop(self, runtime.observer.take());
-}));
+let runtime_id = Runtime::current();
+with_runtime(|runtime| {
+    let prev_observer =
+        SetObserverOnDrop(runtime_id, runtime.observer.take());
+}))
+.expect("tried to ..."); // this error code is not displayed
 ```
+
+so either 
+- `Runtime::current()`
+- `with_runtime(|runtime| {}).unwrap()`
 - [ ] rust source modifier plugin (for activating HMR thru plugin interface)

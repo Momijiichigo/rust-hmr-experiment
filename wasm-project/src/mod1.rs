@@ -49,12 +49,13 @@ pub fn ComponentA_into_view() -> _View {
     // let val = leptos_reactive::untrack_with_diagnostics(|| {
     //     __Comp1().into_view()
     // });
-    let val = leptos_reactive::untrack(|| {
-        log!("In untrack");
-        // __Comp1().into_view()
-    });
+    log!("test object: {:?}", crate::utils::with_test_object(|test| test.a));
+    // let val = leptos_reactive::untrack(|| {
+    //     log!("In untrack");
+    //     // __Comp1().into_view()
+    // });
     
-    log!("{:?}", val);
+    // log!("{:?}", val);
     log!("After exec");
     _View {
         view: ComponentA().into_view(),

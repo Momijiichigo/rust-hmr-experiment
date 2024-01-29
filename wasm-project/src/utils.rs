@@ -21,3 +21,18 @@ pub async fn get_wasm(mod_path: &str) -> Result<WebAssembly::Instance, JsValue> 
     let instance: WebAssembly::Instance = Reflect::get(&wasm, &"instance".into())?.dyn_into()?;
     Ok(instance)
 }
+
+thread_local! {
+    pub static TEST_OBJECT: Test = Test {
+        a: 1,
+        b: 2,
+    };
+}
+pub struct Test {
+    pub a: i32,
+    pub b: i32,
+}
+
+pub fn with_test_object<F: FnOnce(&Test) -> R, R>(f: F) -> R {
+    TEST_OBJECT.with(|test| f(test))
+}
