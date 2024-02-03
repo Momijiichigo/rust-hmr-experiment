@@ -95,13 +95,20 @@ async fn main() -> Result<(), JsValue> {
     log!("Got wasm instance");
     let exports = instance.exports();
     let component_a: Function = Reflect::get(exports.as_ref(), &"func_a".into())?.dyn_into()?;
-    log!("marker 0");
+    log!("# marker 0");
 
     component_a.call0(&JsValue::null())?;
 
-    log!("marker A");
+    log!("# First invokation of investigate_problem");
+    mod1::investigate_problem();
+
+    log!("# marker A");
+    let investigate_error: Function = Reflect::get(exports.as_ref(), &"investigate_problem".into())?.dyn_into()?;
+    log!("# marker B");
+    investigate_error.call0(&JsValue::null())?;
+    log!("# marker C");
     let component_a: Function = Reflect::get(exports.as_ref(), &"ComponentA_into_view".into())?.dyn_into()?;
-    log!("marker B");
+    log!("# marker D");
     let component_a: _View = _View::try_from_js_value(component_a.call0(&JsValue::null())?)?;
     // unsafe {
     //     let raw_component_address: u32 = std::mem::transmute(

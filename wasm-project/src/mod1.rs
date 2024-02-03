@@ -21,7 +21,6 @@ pub fn func_a() {
 
 #[component]
 pub fn ComponentA() -> impl IntoView {
-    log!("Hello from ComponentA!");
     view! {
         <div>
             "Hello from ComponentA!"
@@ -37,11 +36,9 @@ pub fn __Comp1() -> impl IntoView {
         </div>
     }
 }
-pub fn test_comp() -> impl IntoView {
-    leptos_dom::Component::new("Test", move || __Comp1())
-}
+use wasm_project::utils::with_test_object;
 #[wasm_bindgen]
-pub fn ComponentA_into_view() -> _View {
+pub fn investigate_problem() {
     log!("Before exec...");
     // let val = test_comp().into_view();
     // let val = __Comp1().into_view();
@@ -49,7 +46,7 @@ pub fn ComponentA_into_view() -> _View {
     // let val = leptos_reactive::untrack_with_diagnostics(|| {
     //     __Comp1().into_view()
     // });
-    log!("test object: {:?}", crate::utils::with_test_object(|test| test.a));
+    log!("test object: {:?}", with_test_object(|test| test.a));
     // let val = leptos_reactive::untrack(|| {
     //     log!("In untrack");
     //     // __Comp1().into_view()
@@ -57,15 +54,13 @@ pub fn ComponentA_into_view() -> _View {
     
     // log!("{:?}", val);
     log!("After exec");
+}
+
+#[wasm_bindgen]
+pub fn ComponentA_into_view() -> _View {
     _View {
         view: ComponentA().into_view(),
     }
-}
-
-pub fn test1<T>(f: impl FnOnce() -> T) -> T {
-    let result = f();
-
-    result
 }
 #[wasm_bindgen]
 pub struct _View {

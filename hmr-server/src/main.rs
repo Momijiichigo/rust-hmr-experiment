@@ -30,11 +30,12 @@ async fn serve(config: &Config) -> anyhow::Result<()> {
 async fn main() -> anyhow::Result<()> {
     let mut config = Config {
         project_dir: PathBuf::from("../wasm-project"),
+        project_name: "wasm_project".to_string(),
         target_dir: Some(PathBuf::from("../target")),
         src_files: vec![PathBuf::from("mod1.rs")],
     };
-    println!("=== Setup ===");
-    setup(&mut config).await.context("setup failed")?;
+    // println!("=== Setup ===");
+    // setup(&mut config).await.context("setup failed")?;
     println!("=== Recompile module ===");
     recompile_module(&config, &config.src_files[0])
         .await

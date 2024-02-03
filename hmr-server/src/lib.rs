@@ -16,6 +16,7 @@ pub mod modify_wasm;
 pub const ERR_MSG_PATH_TO_STR: &str = "Failed to convert path to string";
 pub struct Config {
     pub project_dir: PathBuf,
+    pub project_name: String,
     /// Optionally specify the target directory for web assets
     pub target_dir: Option<PathBuf>,
     pub src_files: Vec<PathBuf>,

@@ -71,16 +71,9 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
         ])
         .status()
         .context("Failed to compile cargo project")?;
-    let project_name = config
-        .project_dir
-        .file_name()
-        .context("failed to obtain project name")?
-        .to_str()
-        .context(ERR_MSG_PATH_TO_STR)?
-        .replace('-', "_");
     let wasm_file_path = target_web_assets_dir
         .join("pkg")
-        .join(project_name.clone())
+        .join(config.project_name.clone())
         .with_extension("wasm");
     let wasm_file_path_str = wasm_file_path.to_str().context(ERR_MSG_PATH_TO_STR)?;
 
@@ -102,7 +95,7 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
 
     let bindgen_wasm_file_path = target_web_assets_dir
         .join("pkg")
-        .join(format!("{project_name}_bg").clone())
+        .join(format!("{}_bg", config.project_name).clone())
         .with_extension("wasm");
 
     let mut module = modify_wasm::module_from_bytes(

@@ -22,6 +22,11 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
       - [x] parse Custom Linking section of wasm binary and obtain name map of functions
     - [x] demangle import & func names
   - [x] pass in the host's memory & imports to instanciate `mod1.wasm`
+- [ ] Modify the source code and pass to the compiling process
+  - Idea: Virtual sandboxed filesystem that returns processed file content
+    - Similar idea as using `Proxy` in JS but for filesystems
+
+  - [ ] substitute `crate::mod` with `proj_name::mod` only in the module compilation
 - [ ] HMR with Leptos
   - [ ] send `View` from `mod1.wasm` to main wasm
     - Error: unreachable: `mod1.wasm` invoking `env.core::result::unwrap_failed`

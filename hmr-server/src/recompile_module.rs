@@ -118,6 +118,11 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
     //     args.push("-L");
     //     args.push(path);
     // });
+
+    // add the project package itself as a library
+    args.push("--extern");
+    args.push(&config.project_name);
+    // add the dependencies as libraries
     library_names.iter().for_each(|path| {
         args.push("--extern");
         args.push(path);
