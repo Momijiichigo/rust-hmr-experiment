@@ -36,17 +36,29 @@ pub fn __Comp1() -> impl IntoView {
         </div>
     }
 }
-use wasm_project::utils::with_test_object;
+
+#[cfg(not(feature = "separate-comp"))]
+use crate::utils::{Test, with_test_object};
+#[cfg(feature = "separate-comp")]
+use wasm_project::utils::{Test, with_test_object};
 #[wasm_bindgen]
 pub fn investigate_problem() {
-    log!("Before exec...");
+    log!("Before exec....");
     // let val = test_comp().into_view();
     // let val = __Comp1().into_view();
 
     // let val = leptos_reactive::untrack_with_diagnostics(|| {
     //     __Comp1().into_view()
     // });
-    log!("test object: {:?}", with_test_object(|test| test.a));
+    // log!("## get test object");
+    // let mut test_addr: *const Test = std::ptr::null();
+    // with_test_object(|test| unsafe {
+    //     let test = test.clone();
+    //     test_addr = std::mem::transmute(&test)
+    // });
+    // let test = with_test_object(|test| test);
+    // log!("test object: {:?}", test_addr);
+    log!("test object: {:?}", with_test_object(|test| (test.a, test.b)));
     // let val = leptos_reactive::untrack(|| {
     //     log!("In untrack");
     //     // __Comp1().into_view()

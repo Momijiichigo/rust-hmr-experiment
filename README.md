@@ -27,30 +27,6 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
     - Similar idea as using `Proxy` in JS but for filesystems
 
   - [ ] substitute `crate::mod` with `proj_name::mod` only in the module compilation
-- [ ] HMR with Leptos
-  - [ ] send `View` from `mod1.wasm` to main wasm
-    - Error: unreachable: `mod1.wasm` invoking `env.core::result::unwrap_failed`
-    - It is found that the error occurs at:
-    - ```rs
-      leptos_reactive::untrack_with_diagnostics(|| {
-          __ComponentA().into_view()
-      });
-      ```
-    - where the `__ComponentA` returns `impl IntoView`
-    - continuing investigation...
-    - 
-```rs
-use leptos_reactive::runtime::*; // <- private module, idk how to investigate inside...
-// so far, I found that somewhere in the lines below has the casuse of the error
-let runtime_id = Runtime::current();
-with_runtime(|runtime| {
-    let prev_observer =
-        SetObserverOnDrop(runtime_id, runtime.observer.take());
-}))
-.expect("tried to ..."); // this error code is not displayed
-```
-
-so either 
-- `Runtime::current()`
-- `with_runtime(|runtime| {}).unwrap()`
+- [ ] Error: accessing `thread_local!` value from `mod1.wasm` fails; accessing to wrong memory address
+  - Hmmmm
 - [ ] rust source modifier plugin (for activating HMR thru plugin interface)

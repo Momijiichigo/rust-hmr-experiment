@@ -1,6 +1,15 @@
 #![feature(async_closure)]
 #![feature(libstd_sys_internals)]
 #![feature(rt)]
+
+// needed for debugging thread_local
+#![feature(thread_local)]
+#![feature(thread_local_internals)]
+#![feature(core_panic)]
+
+mod mod1;
+pub mod utils;
+
 use js_sys::{Function, Object, Reflect, WebAssembly};
 use std::*;
 use wasm_bindgen::{
@@ -8,8 +17,6 @@ use wasm_bindgen::{
     prelude::*,
 };
 use wasm_bindgen_futures::{spawn_local, JsFuture};
-mod mod1;
-mod utils;
 use leptos::*;
 use utils::get_wasm;
 
@@ -99,13 +106,15 @@ async fn main() -> Result<(), JsValue> {
 
     component_a.call0(&JsValue::null())?;
 
-    log!("# First invokation of investigate_problem");
+    log!("# First invokation of investigate_problem!");
     mod1::investigate_problem();
 
     log!("# marker A");
-    let investigate_error: Function = Reflect::get(exports.as_ref(), &"investigate_problem".into())?.dyn_into()?;
+    let investigate_problem: Function = Reflect::get(exports.as_ref(), &"investigate_problem".into())?.dyn_into()?;
+    log!("# Second invokation of investigate_problem!");
+    investigate_problem.call0(&JsValue::null())?;
+
     log!("# marker B");
-    investigate_error.call0(&JsValue::null())?;
     log!("# marker C");
     let component_a: Function = Reflect::get(exports.as_ref(), &"ComponentA_into_view".into())?.dyn_into()?;
     log!("# marker D");
