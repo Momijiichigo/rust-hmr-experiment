@@ -6,13 +6,18 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-wasm-bindgen = "0.2.89"
-web-sys = { version = "0.3.66", features = ["console", "Window", "Response"] }
-js-sys = "0.3.66"
-wasm-bindgen-futures = "0.4.39"
+wasm-bindgen = "0.2.92"
+web-sys = { version = "0.3.69", features = ["console", "Window", "Response"] }
+js-sys = "0.3.69"
+wasm-bindgen-futures = "0.4.42"
 static_cell = "2.0"
-leptos = { version = "0.5", features = ["csr", "nightly"] }
-leptos_reactive = "0.5"
+leptos = { version = "0.6", features = ["csr", "nightly"] }
+leptos_reactive = "0.6"
+cfg-if = "1.0.0"
+
+[features]
+deault = []
+separate-comp = []
 
 [lib]
 crate-type = ["cdylib", "rlib"]

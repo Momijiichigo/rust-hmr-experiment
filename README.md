@@ -22,11 +22,13 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
       - [x] parse Custom Linking section of wasm binary and obtain name map of functions
     - [x] demangle import & func names
   - [x] pass in the host's memory & imports to instanciate `mod1.wasm`
+- [ ] Error: accessing `thread_local!` value from `mod1.wasm` fails; accessing to wrong memory address
+  - Hmmmm
+  - Try: Override `thread_local` crate for the compilation
+    - Try it in the host module compilation first
 - [ ] Modify the source code and pass to the compiling process
   - Idea: Virtual sandboxed filesystem that returns processed file content
     - Similar idea as using `Proxy` in JS but for filesystems
 
   - [ ] substitute `crate::mod` with `proj_name::mod` only in the module compilation
-- [ ] Error: accessing `thread_local!` value from `mod1.wasm` fails; accessing to wrong memory address
-  - Hmmmm
 - [ ] rust source modifier plugin (for activating HMR thru plugin interface)

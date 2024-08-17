@@ -43,7 +43,7 @@ use crate::utils::{Test, with_test_object};
 use wasm_project::utils::{Test, with_test_object};
 #[wasm_bindgen]
 pub fn investigate_problem() {
-    log!("Before exec....");
+    log!("- Before exec....");
     // let val = test_comp().into_view();
     // let val = __Comp1().into_view();
 
@@ -58,14 +58,25 @@ pub fn investigate_problem() {
     // });
     // let test = with_test_object(|test| test);
     // log!("test object: {:?}", test_addr);
-    log!("test object: {:?}", with_test_object(|test| (test.a, test.b)));
+    log!("- test object: {:?}", with_test_object(|test| {
+        let test_addr = test as *const Test;
+        test_addr
+    }));
     // let val = leptos_reactive::untrack(|| {
     //     log!("In untrack");
     //     // __Comp1().into_view()
     // });
     
     // log!("{:?}", val);
-    log!("After exec");
+    log!("- After exec");
+}
+
+
+#[wasm_bindgen]
+pub fn investigate_problem2(input: &str) {
+    log!("- Before exec....");
+    log!("- input: {:?}", input);
+    log!("- After exec");
 }
 
 #[wasm_bindgen]
