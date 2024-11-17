@@ -75,7 +75,9 @@ pub fn investigate_problem() {
 #[wasm_bindgen]
 pub fn investigate_problem2(input: &str) {
     log!("- Before exec....");
-    log!("- input: {:?}", input);
+    unsafe {
+        log!("- input: {:?}", input);
+    }
     log!("- After exec");
 }
 

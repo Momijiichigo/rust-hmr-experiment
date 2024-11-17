@@ -105,14 +105,17 @@ async fn main() -> Result<(), JsValue> {
 
     func_a.call0(&JsValue::null())?;
 
-    log!("# First invokation of investigate_problem!");
-    mod1::investigate_problem();
+    log!("# Calling `investigate_problem(str)` within host.wasm");
+    mod1::investigate_problem2("Hello from host!");
 
     log!("# marker A");
     let investigate_problem: Function =
-        Reflect::get(exports.as_ref(), &"investigate_problem".into())?.dyn_into()?;
-    log!("# Second invokation of investigate_problem!");
-    investigate_problem.call0(&JsValue::null())?;
+        Reflect::get(exports.as_ref(), &"investigate_problem2".into())?.dyn_into()?;
+    log!("# Calling `investigate_problem(str)` in mod1.wasm from host.wasm");
+    unsafe {
+        let str_info = std::mem::transmute::<_,(usize,usize)>("Hello from mod1.wasm! string pointer correctly passed!");
+        investigate_problem.call2(&JsValue::null(), &JsValue::from(str_info.0), &JsValue::from(str_info.1))?;
+    }
 
     log!("# marker B");
     let component_a: Function =
