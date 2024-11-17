@@ -4,6 +4,7 @@ Rust Web Dev;
 Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
 
 ![overview](./README_MEDIA/brief_overview.png)
+![image](https://github.com/user-attachments/assets/6354ee3d-374c-45cb-810c-8dadd8e12836)
 
 ## Brief Roadmap
 
