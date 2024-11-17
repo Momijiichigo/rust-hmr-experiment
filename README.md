@@ -4,6 +4,19 @@ Rust Web Dev;
 Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
 
 ![overview](./README_MEDIA/brief_overview.png)
+
+## File tree
+- `./hmr-server`
+  - It does:
+    - compilation & modification of host-wasm
+    - compilation & modification of mod1.wasm
+    - serves to `localhost:3000`
+- `./wasm-project`
+  - It is the sample project that will be compiled into wasm
+  - contains `lib.rs` and `mod1.rs`
+ 
+## Current Status
+
 ![image](https://github.com/user-attachments/assets/6354ee3d-374c-45cb-810c-8dadd8e12836)
 
 ## Run
