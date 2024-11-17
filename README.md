@@ -14,10 +14,6 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
 - `./wasm-project`
   - It is the sample project that will be compiled into wasm
   - contains `lib.rs` and `mod1.rs`
- 
-## Current Status
-
-![image](https://github.com/user-attachments/assets/6354ee3d-374c-45cb-810c-8dadd8e12836)
 
 ## Run
 ```sh
@@ -52,3 +48,7 @@ cargo run
 
   - [ ] substitute `crate::mod` with `proj_name::mod` only in the module compilation
 - [ ] rust source modifier plugin (for activating HMR thru plugin interface)
+
+## Current Status
+
+![image](https://github.com/user-attachments/assets/6354ee3d-374c-45cb-810c-8dadd8e12836)
