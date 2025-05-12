@@ -5,6 +5,12 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
 
 ![overview](./README_MEDIA/brief_overview.png)
 
+## Significance
+- `mod1.wasm` has all its dependencies externalized
+  - It compiles **extremely fast** and is **extremely lightweight**.
+    - `mod1.wasm` imports all dependencies (std libraries, dependency functions, memory, etc.)
+- It proves the possibility of dynamic component replacement on browser without page reloading.
+
 ## File tree
 - `./hmr-server`
   - It does:
@@ -38,6 +44,9 @@ cargo run
       - [x] parse Custom Linking section of wasm binary and obtain name map of functions
     - [x] demangle import & func names
   - [x] pass in the host's memory & imports to instanciate `mod1.wasm`
+- [x] Invoking functions in `mod1.wasm`
+  - [x] func with no param
+  - [x] func that takes in params of values / references
 - [x] Accessing `thread_local!` value in host from `mod1.wasm`
 - [ ] Make a test function in `mod1` that appends a component to `body()` when invoked
 - [ ] Modify the source code and pass to the compiling process
