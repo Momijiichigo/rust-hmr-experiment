@@ -38,7 +38,7 @@ cargo run --release
       - [x] parse Custom Linking section of wasm binary and obtain name map of functions
     - [x] demangle import & func names
   - [x] pass in the host's memory & imports to instanciate `mod1.wasm`
-- [x] Accessing `thread_local!` value from `mod1.wasm`
+- [x] Accessing `thread_local!` value in host from `mod1.wasm`
 - [ ] Modify the source code and pass to the compiling process
   - Idea: Virtual sandboxed filesystem that returns processed file content
     - Similar idea as using `Proxy` in JS but for filesystems
