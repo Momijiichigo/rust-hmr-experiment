@@ -18,7 +18,7 @@ Proof of Concept for HMR (Hot Module Replacement) using WASM modules.
 ## Run
 ```sh
 cd hmr-server
-cargo run --release
+cargo run
 ```
 
 ## Brief Roadmap
