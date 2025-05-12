@@ -1,5 +1,8 @@
 use js_sys::{Function, Object, Reflect, WebAssembly};
-use leptos::*;
+use leptos::html::{div, HtmlElement};
+use leptos::tachys::dom::body;
+use leptos::{prelude::View, *};
+use leptos::prelude::{ElementChild, Mountable};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 
@@ -28,66 +31,41 @@ pub fn ComponentA() -> impl IntoView {
     }
 }
 
-#[allow(non_snake_case, dead_code, clippy::too_many_arguments)]
-pub fn __Comp1() -> impl IntoView {
-    view! {
-        <div>
-            "Hello from ComponentA!"
-        </div>
-    }
+use leptos::mount::{self, mount_to, mount_to_body};
+#[wasm_bindgen]
+pub fn ComponentA_mount_to() {
+    // let unmount_handle = mount_to_body(ComponentA);
+    // unmount_handle.forget();
 }
+// #[wasm_bindgen]
+// pub struct _View(View<()>);
+
+// #[allow(non_snake_case, dead_code, clippy::too_many_arguments)]
+// pub fn __Comp1() -> impl IntoView {
+//     view! {
+//         <div>
+//             "Hello from ComponentA!"
+//         </div>
+//     }
+// }
+
 
 #[cfg(not(feature = "separate-comp"))]
 use crate::utils::{Test, with_test_object};
 #[cfg(feature = "separate-comp")]
 use wasm_project::utils::{Test, with_test_object};
 #[wasm_bindgen]
-pub fn investigate_problem() {
+pub fn access_thread_local_static() {
     log!("- Before exec....");
-    // let val = test_comp().into_view();
-    // let val = __Comp1().into_view();
-
-    // let val = leptos_reactive::untrack_with_diagnostics(|| {
-    //     __Comp1().into_view()
-    // });
-    // log!("## get test object");
-    // let mut test_addr: *const Test = std::ptr::null();
-    // with_test_object(|test| unsafe {
-    //     let test = test.clone();
-    //     test_addr = std::mem::transmute(&test)
-    // });
-    // let test = with_test_object(|test| test);
-    // log!("test object: {:?}", test_addr);
     log!("- test object: {:?}", with_test_object(|test| {
-        let test_addr = test as *const Test;
-        test_addr
+        test.clone()
     }));
-    // let val = leptos_reactive::untrack(|| {
-    //     log!("In untrack");
-    //     // __Comp1().into_view()
-    // });
-    
-    // log!("{:?}", val);
     log!("- After exec");
 }
 
 
 #[wasm_bindgen]
-pub fn investigate_problem2(input: &str) {
-    log!("- Before exec....");
-    unsafe {
-        log!("- input: {:?}", input);
-    }
-    log!("- After exec");
+pub fn passing_reference(input: &str) {
+    log!("Passing reference test: {:?}", input);
 }
 
-#[wasm_bindgen]
-pub fn ComponentA_into_view() -> _View {
-    _View {
-        view: ComponentA().into_view(),
-    }
-}
-#[wasm_bindgen]
-pub struct _View {
-    view: View,
-}
