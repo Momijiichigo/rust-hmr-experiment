@@ -1,6 +1,6 @@
 use axum::{
     routing::{get, get_service},
-    Router, Server,
+    Router,
 };
 use std::path::{Path, PathBuf};
 use std::process::Command;

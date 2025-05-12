@@ -5,7 +5,7 @@ use crate::{
 use anyhow::{Context, Error};
 use axum::{
     routing::{get, get_service},
-    Router, Server,
+    Router,
 };
 use nom::AsBytes;
 use std::process::Command;
@@ -95,7 +95,7 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
         "--target",
         "wasm32-unknown-unknown",
         "-C",
-        "opt-level=1",
+        "opt-level=0",
         "--crate-type",
         "cdylib",
         "--emit",
@@ -140,7 +140,6 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
     restore_export(&mut module)?;
     demangle_funcs(&mut module);
     demangle_imports(&mut module);
-    remove_stack_ptr_import(&mut module)?;
 
     let output_name = target_dir
         .join("web-assets")
@@ -152,16 +151,6 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
     Ok(())
 }
 
-/// removes the import of `__stack_pointer` global variable and set initial value to 1048576
-fn remove_stack_ptr_import(module: &mut Module) -> anyhow::Result<()> {
-    // module.imports.delete(
-    //     module
-    //         .imports
-    //         .find("env", "__stack_pointer")
-    //         .context("no import of __stack_pointer found")?,
-    // );
-    Ok(())
-}
 /// modifies and adds the function exports into the wasm object file,
 /// where the exports are omitted in the object file.
 ///

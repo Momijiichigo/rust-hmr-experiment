@@ -1,7 +1,7 @@
 use anyhow::Context;
 use axum::{
     routing::{get, get_service},
-    Router, Server,
+    Router,
 };
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -60,15 +60,19 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
                 .context(ERR_MSG_PATH_TO_STR)?,
             "-Z",
             "unstable-options",
-            "--out-dir",
+            "--artifact-dir",
             target_web_assets_dir
                 .join("pkg")
                 .to_str()
                 .context(ERR_MSG_PATH_TO_STR)?,
             "--target",
             "wasm32-unknown-unknown",
+            #[cfg(not(feature = "debug-compilation-wasm-pack"))]
             "--release",
+            "--config",
+            "profile.opt-level=0",
         ])
+        .env("RUSTFLAGS", "-C link-arg=-zstack-size=0x20000000")
         .status()
         .context("Failed to compile cargo project")?;
     let wasm_file_path = target_web_assets_dir
@@ -119,7 +123,14 @@ pub async fn setup(config: &mut Config) -> anyhow::Result<()> {
     module.globals.iter().for_each(|global| {
         // TODO: change to reliable way to detect stack pointer
         // by parsing the custom section
-        if matches!(global, walrus::Global { ty: walrus::ValType::I32, mutable: true, .. }) {
+        if matches!(
+            global,
+            walrus::Global {
+                ty: walrus::ValType::I32,
+                mutable: true,
+                ..
+            }
+        ) {
             module.exports.add("__stack_pointer", global.id());
         }
     });

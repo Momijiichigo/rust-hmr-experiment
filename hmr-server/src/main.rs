@@ -1,27 +1,40 @@
 use anyhow::Context;
 use axum::{
     routing::{get, get_service},
-    Router, Server,
+    Router,
 };
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::{collections::HashSet, fs};
-use tower_http::services::ServeDir;
+use tower_http::services::{ServeDir, ServeFile};
 
 use hmr_server::{modify_glue::*, recompile_module::*, setup::*, Config, ERR_MSG_PATH_TO_STR};
 
+async fn not_found_handler() -> axum::response::Response {
+    // Handle 404
+    axum::response::Response::new(axum::body::Body::from("404 Not Found"))
+}
+
 async fn serve(config: &Config) -> anyhow::Result<()> {
     let target_dir = &config.target_dir.to_owned().context("Target dir not set")?;
+
 
     let target_web_assets_dir = target_dir.join("web-assets");
     // Set up router
 
     // Start server
-    Server::bind(&"127.0.0.1:3000".parse()?)
-        .serve(tower::make::Shared::new(ServeDir::new(
-            &target_web_assets_dir,
-        )))
-        .await?;
+    axum::serve(
+        tokio::net::TcpListener::bind("127.0.0.1:3000").await?,
+        Router::new()
+            .route("/", get_service(ServeFile::new(
+                target_web_assets_dir.join("index.html"),
+            )))
+            .fallback_service(
+                ServeDir::new(&target_web_assets_dir)
+            )
+            // nest_service("/", get_service(ServeDir::new(&target_web_assets_dir))),
+    )
+    .await?;
 
     Ok(())
 }
