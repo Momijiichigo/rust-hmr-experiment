@@ -39,6 +39,7 @@ cargo run
     - [x] demangle import & func names
   - [x] pass in the host's memory & imports to instanciate `mod1.wasm`
 - [x] Accessing `thread_local!` value in host from `mod1.wasm`
+- [ ] Make a test function in `mod1` that appends a component to `body()` when invoked
 - [ ] Modify the source code and pass to the compiling process
   - Idea: Virtual sandboxed filesystem that returns processed file content
     - Similar idea as using `Proxy` in JS but for filesystems
