@@ -38,10 +38,7 @@ cargo run --release
       - [x] parse Custom Linking section of wasm binary and obtain name map of functions
     - [x] demangle import & func names
   - [x] pass in the host's memory & imports to instanciate `mod1.wasm`
-- [ ] Error: accessing `thread_local!` value from `mod1.wasm` fails; accessing to wrong memory address
-  - Hmmmm
-  - Try: Override `thread_local` crate for the compilation
-    - Try it in the host module compilation first
+- [x] Accessing `thread_local!` value from `mod1.wasm`
 - [ ] Modify the source code and pass to the compiling process
   - Idea: Virtual sandboxed filesystem that returns processed file content
     - Similar idea as using `Proxy` in JS but for filesystems
@@ -51,4 +48,5 @@ cargo run --release
 
 ## Current Status
 
-![image](https://github.com/user-attachments/assets/6354ee3d-374c-45cb-810c-8dadd8e12836)
+![image](https://github.com/user-attachments/assets/811a554a-d7e4-4c8a-863a-9be14ace4b32)
+
