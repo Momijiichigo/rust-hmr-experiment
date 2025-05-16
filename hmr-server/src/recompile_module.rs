@@ -91,7 +91,7 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
     let input_name = config.project_dir.join("src").join(mod_path);
     let mut args = vec![
         "--edition",
-        "2021",
+        "2024",
         "--target",
         "wasm32-unknown-unknown",
         "-C",

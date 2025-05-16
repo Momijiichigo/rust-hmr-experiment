@@ -42,9 +42,9 @@ async fn serve(config: &Config) -> anyhow::Result<()> {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let mut config = Config {
-        project_dir: PathBuf::from("../wasm-project"),
+        project_dir: PathBuf::from("..").join("wasm-project"),
         project_name: "wasm_project".to_string(),
-        target_dir: Some(PathBuf::from("../target")),
+        target_dir: Some(PathBuf::from("..").join("target")),
         src_files: vec![PathBuf::from("mod1.rs")],
     };
     println!("=== Setup ===");
