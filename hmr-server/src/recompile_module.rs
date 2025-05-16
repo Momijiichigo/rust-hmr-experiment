@@ -45,7 +45,7 @@ pub async fn recompile_module(config: &Config, mod_path: &Path) -> anyhow::Resul
                 let file = fs::read_to_string(entry)?;
 
                 for line in file.split(&[' ', '\n']) {
-                    if line.contains(".cargo/registry") {
+                    if line.contains(".cargo/registry") || line.contains(".cargo\\registry") {
                         let crate_path = PathBuf::from(line);
                         // strip `/src/...` from the path
                         let mut crate_path = crate_path.as_path();
