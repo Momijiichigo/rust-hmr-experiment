@@ -53,7 +53,7 @@ async fn main() -> anyhow::Result<()> {
     recompile_module(&config, &config.src_files[0])
         .await
         .context("recompile module failed")?;
-    println!("=== Serve ===");
+    println!("=== Serve to localhost:3000 ===");
     serve(&config).await.context("serve failed")?;
     Ok(())
 }
