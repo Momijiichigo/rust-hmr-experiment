@@ -44,9 +44,9 @@ async function run() {
       //     return project[prop](...args);
       //   }
       // }
-      if (prop === "__stack_pointer") {
-        return new WebAssembly.Global({value: "i32", mutable: true}, project.__stack_pointer.value);
-      }
+      // if (prop === "__stack_pointer") {
+      //   return new WebAssembly.Global({value: "i32", mutable: true}, project.__stack_pointer.value);
+      // }
       if (prop in project) {
         return project[prop];
       }
