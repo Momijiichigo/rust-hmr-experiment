@@ -48,7 +48,7 @@ cargo run
   - [x] func with no param
   - [x] func that takes in params of values / references
 - [x] Accessing `thread_local!` value in host from `mod1.wasm`
-- [x] Make a test function in `mod1` that appends a component to `body()` when invoked
+- [x] Make a test function in `mod1` that appends a Leptos component to `body()` when invoked
 - [ ] Modify the source code and pass to the compiling process
   - Idea: Virtual sandboxed filesystem that returns processed file content
     - Similar idea as using `Proxy` in JS but for filesystems
