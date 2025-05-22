@@ -11,7 +11,8 @@ mod mod1;
 pub mod utils;
 
 use js_sys::{Function, Object, Reflect, WebAssembly};
-use leptos::*;
+use leptos::{tachys::dom::body, *};
+use web_sys::HtmlElement;
 use std::*;
 use utils::get_wasm;
 use wasm_bindgen::{
@@ -77,10 +78,20 @@ async fn main() -> Result<(), JsValue> {
     log!("# Calling `access_thread_local_static()` in mod1.wasm");
     access_thread_local_static.call0(&JsValue::null())?;
 
-    let mount_component_a: Function =
-        Reflect::get(exports.as_ref(), &"mount_component_a".into())?.dyn_into()?;
     log!("# Calling `mount_component_a()` in mod1.wasm");
-    mount_component_a.call0(&JsValue::null())?;
+    {
+        let mount_component_a: Function =
+            Reflect::get(exports.as_ref(), &"mount_component_a".into())?.dyn_into()?;
+
+        let parent = body();
+
+        let a = unsafe {
+            std::mem::transmute::<HtmlElement, u32>(parent)
+        };
+        // JS number type is f64
+        let a = a as f64;
+        mount_component_a.call1(&JsValue::null(), &a.into())?;
+    }
 
 
 

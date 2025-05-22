@@ -41,6 +41,18 @@ pub async fn get_wasm(mod_path: &str) -> Result<WebAssembly::Instance, JsValue> 
     Ok(instance)
 }
 
+// pub struct WasmBinInfo {
+//     pub bytes: Vec<u8>,
+// }
+//
+// pub async fn get_wasm_bin(mod_path: &str) -> Result<WasmBinInfo, JsValue> {
+//     let resp = web_sys::window().unwrap_throw().fetch_with_str(mod_path);
+//     let wasm = JsFuture::from(resp).await?;
+//     let array_buffer: ArrayBuffer = wasm.dyn_into()?;
+//     let bytes = js_sys::Uint8Array::new(&array_buffer).to_vec();
+//     Ok(WasmBinInfo { bytes })
+// }
+
 // pub static UNKO: u32 = 56;
 
 thread_local! {

@@ -22,6 +22,14 @@ pub fn func_a() {
     log!("Hello from mod1.wasm!!");
 }
 
+
+#[unsafe(export_name = "func_b")]
+pub fn func_b(input: i32) -> i32 {
+    2 * input
+}
+
+
+
 #[component]
 pub fn ComponentA() -> impl IntoView {
     view! {
@@ -34,9 +42,9 @@ pub fn ComponentA() -> impl IntoView {
 use leptos::mount::{self, mount_to, mount_to_body};
 
 #[unsafe(export_name = "mount_component_a")]
-pub fn ComponentA_mount_to() {
-    let unmount_handle = mount_to_body(ComponentA);
-    // unmount_handle.fo
+pub fn ComponentA_mount_to(parent: web_sys::HtmlElement) {
+    let unmount_handle = mount_to(parent, ComponentA);
+    unmount_handle.forget();
 }
 // #[wasm_bindgen]
 // pub struct _View(View<()>);
