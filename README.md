@@ -33,9 +33,6 @@ cargo run
 - [x] modify the main wasm so it exports all the library functions
   - e.g. `alloc::alloc::handle_alloc_error`
 - [x] Compile a single rust file into a separate WASM file (component module)
-- [x] Load the component WASM module (`mod1.wasm`) from main WASM module
-  - [x] Import object: `__wbindgen_placeholder__`, `__wbindgen_externref_xform__` fields
-  - [x] Use of [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) in JS to flexibly resolve the importObject for WASM instanciation
   - [x] Compile `mod1.rs` into object file with `--emit obj` flag in `rustc`
     - `mod1.wasm` will be minimal and imports all library functions at runtime
     - also imports memory from outside
@@ -43,6 +40,9 @@ cargo run
     - [x] add exports
       - [x] parse Custom Linking section of wasm binary and obtain name map of functions
     - [x] demangle import & func names
+- [x] Load the component WASM module (`mod1.wasm`) from main WASM module
+  - [x] Import object: `__wbindgen_placeholder__`, `__wbindgen_externref_xform__` fields
+  - [x] Use of [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) in JS to flexibly resolve the importObject for WASM instanciation
   - [x] pass in the host's memory & imports to instanciate `mod1.wasm`
 - [x] Invoking functions in `mod1.wasm`
   - [x] func with no param
