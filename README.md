@@ -48,7 +48,7 @@ cargo run
   - [x] func with no param
   - [x] func that takes in params of values / references
 - [x] Accessing `thread_local!` value in host from `mod1.wasm`
-- [ ] Make a test function in `mod1` that appends a component to `body()` when invoked
+- [x] Make a test function in `mod1` that appends a component to `body()` when invoked
 - [ ] Modify the source code and pass to the compiling process
   - Idea: Virtual sandboxed filesystem that returns processed file content
     - Similar idea as using `Proxy` in JS but for filesystems
@@ -58,5 +58,5 @@ cargo run
 
 ## Current Status
 
-![image](https://github.com/user-attachments/assets/811a554a-d7e4-4c8a-863a-9be14ace4b32)
+![image](https://github.com/user-attachments/assets/050c7315-1bb9-4c5b-aa62-999ff6117c45)
 
