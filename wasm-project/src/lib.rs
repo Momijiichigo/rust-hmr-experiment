@@ -65,7 +65,8 @@ async fn main() -> Result<(), JsValue> {
         // JS number type is f64
         let addr = addr as f64;
         let len = len as f64;
-        let _ = passing_reference.call2(&JsValue::null(), &addr.into(), &len.into());
+        let r = passing_reference.call2(&JsValue::null(), &addr.into(), &len.into())?;
+        log!("Passing reference result: {:?}", r);
     }
 
     log!("# Calling `access_thread_local_static()` within host.wasm");

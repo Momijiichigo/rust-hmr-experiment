@@ -16,8 +16,8 @@ macro_rules! log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
 
-#[no_mangle]
-#[wasm_bindgen]
+// #[no_mangle]
+#[unsafe(export_name = "func_a")]
 pub fn func_a() {
     log!("Hello from mod1.wasm!!");
 }
@@ -32,7 +32,6 @@ pub fn ComponentA() -> impl IntoView {
 }
 
 use leptos::mount::{self, mount_to, mount_to_body};
-#[wasm_bindgen]
 pub fn ComponentA_mount_to() {
     // let unmount_handle = mount_to_body(ComponentA);
     // unmount_handle.forget();
@@ -54,7 +53,7 @@ pub fn ComponentA_mount_to() {
 use crate::utils::{Test, with_test_object};
 #[cfg(feature = "separate-comp")]
 use wasm_project::utils::{Test, with_test_object};
-#[wasm_bindgen]
+#[unsafe(export_name = "access_thread_local_static")]
 pub fn access_thread_local_static() {
     log!("- Before exec....");
     log!("- test object: {:?}", with_test_object(|test| {
@@ -63,9 +62,9 @@ pub fn access_thread_local_static() {
     log!("- After exec");
 }
 
-
-#[wasm_bindgen]
-pub fn passing_reference(input: &str) {
+#[unsafe(export_name = "passing_reference")]
+pub fn passing_reference(input: &str) -> i32 {
     log!("Passing reference test: {:?}", input);
+    45
 }
 
