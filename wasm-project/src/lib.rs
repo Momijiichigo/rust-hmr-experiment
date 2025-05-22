@@ -75,7 +75,14 @@ async fn main() -> Result<(), JsValue> {
     let access_thread_local_static: Function =
         Reflect::get(exports.as_ref(), &"access_thread_local_static".into())?.dyn_into()?;
     log!("# Calling `access_thread_local_static()` in mod1.wasm");
-    let _ = access_thread_local_static.call0(&JsValue::null());
+    access_thread_local_static.call0(&JsValue::null())?;
+
+    let mount_component_a: Function =
+        Reflect::get(exports.as_ref(), &"mount_component_a".into())?.dyn_into()?;
+    log!("# Calling `mount_component_a()` in mod1.wasm");
+    mount_component_a.call0(&JsValue::null())?;
+
+
 
     // log!("# marker A");
     // log!("# marker D");
